@@ -8,7 +8,7 @@ SHOW_EXPECT_SCRIPT_MSG=1
 NODE_SETUP_LOG=files_output/node-setup.log
 
 ####################################################################################################################
-# menu for Ansible setup on the master and slave nodes
+# menu for Ansible setup
 
 while [[ $REPLY != 0 ]]; do
 

@@ -2,44 +2,15 @@
 
 # Assumptions:
 # 1)  The script is run with sudo privileges on the master node
-# 2)  When prompted, the user supplies their password for the slaves, so that the script may proceed without 
+# 2)  When prompted, the user supplies their password for the installation node, so that the script may proceed without 
 #     user intervention.
-# 3)  It is assumed that the user password for all slaves is the same.
-# 4)  It is assumed that the user does not already have passwordless login to the nodes in the cluster.
+# 3)  It is assumed that the user does not already have passwordless login to the nodes in the cluster.
 #     Presently, the file assumes the remote system will prompt the expect.sh code for the program
 #     ** user's password.
 #     ** Worse case scenario, this script can be executed on the slave manually with the following paramaters:
 #	 ANSIBLE_UN="$1" 		= ansible
 #	 ANSIBLE_PWD="$2"		= ansible
-#	 PROG_USER_SELECTION="$3"	= 3 (must be the number three on the slave)
-#	 SLAVE_FILE="$4"		= slaves.txt
-# 5)  The user selects menu item 1 (master) before selecting item 2 (slaves)
-
-# This script will do the following:
-# Provide a menu to allow the user to select between updating the master and slave nodes.
-
-# Master Node
-# 1) apt-get update, upgrade, autoremove
-# 2) create the user ansible
-# 3) give user ansible sudo privileges without password prompt
-# 4) generate ssh key for ansible and update its known_host file so that ansible can ssh into localhost
-#    without password prompt
-# 5) use sshpass and scp to send a copy of this script to each slave along with a copy of the master node's public ssh key
-# 6) execute the script with sudo on each slave, using the user's password
-
-# Managed Nodes (slaves)
-# 1) update, upgrade, autoremove, install python
-# 2) create the user ansible
-# 3) give user ansible sudo privileges without password prompt
-# 4) generate ssh key for ansible and update its known_host file so that ansible can ssh into localhost
-#    without password prompt
-# 5) copy the master public key into ansible's authorized_keys file so that ansible@master can ssh ansible@slave
-#    without password prompt
-
-# NOTE: all of the slaves' ssh keys will be copied to /home/ansible/.ssh/known_hosts on the master node, 
-# 	using ssh-keyscan slaves.txt, from the master node, so that the master node will recognized
-# 	the slave nodes when the user ansible tries to ssh into the slave nodes to execute Ansible playbooks.
-#       This is done after all the slaves have been updated, although it could probably be run at anytime.
+#	 SLAVE_FILE="$4"		= node.txt
 
 ####################################################################################################################
 # globals
@@ -78,29 +49,19 @@ func_update_system(){
 	# Update, upgrade, autoremove
 
 	echo ""
-	echo "apt-get update"
+	echo "yum update -y"
 	echo ""
-	apt-get update
-
-	echo ""
-	echo "apt-get upgrade -y"
-	echo ""
-	apt-get upgrade -y
-
-	echo ""
-	echo "apt-get autoremove -y"
-	echo ""
-	apt-get autoremove -y
+	yum update -y
 }
 #===================================================================================================================
 func_install_ansible_software(){
 
-	# Install the Ansible software from the current Ubuntu repo, or add Ansible's repo, if desired.
+	# Install the Ansible software from the current repo, or add Ansible's repo, if desired.
 
 	echo ""
-	echo "apt-get install -y ansible"
+	echo "yum install -y ansible"
 	echo ""
-	apt-get install -y ansible
+	yum install -y ansible
 }
 #===================================================================================================================
 func_create_ansible_user(){
@@ -215,9 +176,9 @@ func_create_set_ssh_keys_localhost(){
 func_install_python(){
 
 	echo ""
-	echo "apt-get install -y python"
+	echo "yum install -y python"
 	echo ""
-	apt-get install -y python
+	yum install -y python
 }
 #===================================================================================================================
 func_get_master_rsa_pub(){
@@ -246,17 +207,17 @@ func_install_sshpass(){
 	# install sshpass to facilitate automated interaction with managed nodes
 
 	echo ""
-	echo "apt-get install -y sshpass"
+	echo "yum install -y sshpass"
 	echo ""
-	apt-get install -y sshpass
+	yum install -y sshpass
 }
 #===================================================================================================================
 func_remove_sshpass(){
 
 	echo ""
-	echo "apt-get purge -y sshpass"
+	echo "yum purge -y sshpass"
 	echo ""
-	apt-get purge -y sshpass
+	yum purge -y sshpass
 }
 #===================================================================================================================
 func_install_expect(){
@@ -264,17 +225,17 @@ func_install_expect(){
 	# install expect to facilitate logging into the user account of slave nodes and running setup script with sudo
 
 	echo ""
-	echo "apt-get install -y expect"
+	echo "yum install -y expect"
 	echo ""
-	apt-get install -y expect
+	yum install -y expect
 }
 #===================================================================================================================
 func_remove_expect(){
 
 	echo ""
-	echo "apt-get purge -y expect"
+	echo "yum purge -y expect"
 	echo ""
-	apt-get purge -y expect
+	yum purge -y expect
 }
 #===================================================================================================================
 func_remove_public_key_file(){
@@ -407,14 +368,14 @@ func_execute_script_on_slave(){
 		NOTE:  This message will display one time for $PAUSE seconds.
 		---------------------------------------------------------------------------------------------------------------
 		The script expect-script.sh that is about to run has a timeout setting of $EXPECT_TIMEOUT seconds, in case the 
-			slave has a lot of files to apt-get update, upgrade, autoremove.
+			slave has a lot of files to yum update, upgrade, autoremove.
 
 		In reading about about using the Expect scripting language, timeouts as well as incorrect expectations of the 
 			remote system's response are frequent sources of error.
 			eg.  Your code expect a resonse of "abc", but "abc " is returned instead.
 
 		I'm not sure this is actually the problem, but viewing the logs of slaves that hadn't been updated in awhile, 
-			the update script appeared to quit while the slaves were still running apt-get upgrade.
+			the update script appeared to quit while the slaves were still running yum upgrade.
 
 		I read of similar issues by other users, and frequently the suggestion was that the timeout setting was set
 			too low in their script.  The default is 10 seconds.
