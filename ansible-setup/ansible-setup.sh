@@ -85,7 +85,7 @@ func_update_system(){
 #===================================================================================================================
 func_install_ansible_software(){
 
-	# Install the Ansible software from the current Ubuntu repo, or add Ansible's repo, if desired.
+	# Install the Ansible software from the current repo, or add Ansible's repo, if desired.
 
 	echo ""
 	echo "yum install -y ansible"
