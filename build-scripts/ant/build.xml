@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project name="jboss-wildfly-ansible-bash" default="info">
+   <target name="info">
+      <echo>Apache Ant version is ${ant.version}.</echo>
+	  <echo>Let's get started!</echo>	  
+   </target>
+</project>
