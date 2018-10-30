@@ -55,7 +55,7 @@ while [[ $REPLY != 0 ]]; do
 			echo "1) Master Setup Selected."
 
 			echo "   output to:  `pwd`/$PATH_TO_MASTER_LOG_FILE"
-			sleep 5
+			sleep 3
 
 			echo ""
 			./ansible-setup.sh $ANSIBLE_UN $ANSIBLE_PWD $REPLY $SLAVE_FILE "no-val" $LOG_FILES_PATH | tee `pwd`/$PATH_TO_MASTER_LOG_FILE
@@ -72,13 +72,13 @@ while [[ $REPLY != 0 ]]; do
 
 			Note:	
 			Managed node (slaves) log files will be stored in 
-			`pwd`/files_output upon upon completion of updates.
+			`pwd`/$LOG_FILES_PATH upon upon completion of updates.
 			_EOF_
-			sleep 5
+			sleep 3
 
 			echo ""
-			./ansible-setup.sh $ANSIBLE_UN $ANSIBLE_PWD $REPLY $SLAVE_FILE $SHOW_EXPECT_SCRIPT_MSG
-			chown -R `logname`.`logname` `pwd`/$LOG_FILES_PATH/
+			./ansible-setup.sh $ANSIBLE_UN $ANSIBLE_PWD $REPLY $SLAVE_FILE $SHOW_EXPECT_SCRIPT_MSG $LOG_FILES_PATH
+			chown -R `logname`.`logname` `pwd`/$LOG_FILES_PATH
 			echo ""
 			
 			read -n 1 -s -r -p "Press any key to continue"
