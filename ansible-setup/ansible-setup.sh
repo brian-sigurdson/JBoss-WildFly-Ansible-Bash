@@ -389,7 +389,7 @@ func_remove_slave_log_file(){
 func_execute_script_on_slave(){
 
 	local REMOTE_IP=$1
-	local PAUSE=45
+	local PAUSE=35
 	local EXPECT_TIMEOUT=120
 	# PROG_USER_SELECTION=3 is required to force slave to run proper functions
 	PROG_USER_SELECTION=3
