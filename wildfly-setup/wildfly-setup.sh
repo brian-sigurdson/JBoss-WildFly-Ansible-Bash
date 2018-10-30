@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Purpose
-# To manage the cluster setup.
+# To manage the wildfly setup.
 #
 # This script will be passed the following arguments by cloudlab:
 # master:  cl-setup.sh MASTER_NAME SLAVE_NAME_PREFIX NUM_SLAVES HADOOP_VERSION TESTING
