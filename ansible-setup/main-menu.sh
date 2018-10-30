@@ -22,7 +22,8 @@ ANSIBLE_PWD="$ANSIBLE_UN"
 SLAVE_FILE="slaves.txt"
 SHOW_EXPECT_SCRIPT_MSG=1
 MASTER_LOG_FILE_NAME=master-log.txt
-LOG_FILES_PATH=output/
+LOG_FILES_PATH=output
+PATH_TO_MASTER_LOG_FILE=$LOG_FILES_PATH/$MASTER_LOG_FILE_NAME
 
 ####################################################################################################################
 # menu for Ansible setup on the master and slave nodes
@@ -53,12 +54,12 @@ while [[ $REPLY != 0 ]]; do
 		1) 	echo ""
 			echo "1) Master Setup Selected."
 
-			echo "   output to:  `pwd`/$LOG_FILES_PATH/$MASTER_LOG_FILE_NAME"
+			echo "   output to:  `pwd`/$PATH_TO_MASTER_LOG_FILE"
 			sleep 5
 
 			echo ""
-			./ansible-setup.sh $ANSIBLE_UN $ANSIBLE_PWD $REPLY $SLAVE_FILE | tee `pwd`/$LOG_FILES_PATH/$MASTER_LOG_FILE_NAME
-			chown `logname`.`logname` `pwd`/$LOG_FILES_PATH/$MASTER_LOG_FILE_NAME
+			./ansible-setup.sh $ANSIBLE_UN $ANSIBLE_PWD $REPLY $SLAVE_FILE "no-val" $LOG_FILES_PATH | tee `pwd`/$PATH_TO_MASTER_LOG_FILE
+			chown `logname`.`logname` `pwd`/$PATH_TO_MASTER_LOG_FILE
 			echo ""
 			
 			read -n 1 -s -r -p "Press any key to continue"
@@ -77,7 +78,7 @@ while [[ $REPLY != 0 ]]; do
 
 			echo ""
 			./ansible-setup.sh $ANSIBLE_UN $ANSIBLE_PWD $REPLY $SLAVE_FILE $SHOW_EXPECT_SCRIPT_MSG
-			chown -R `logname`.`logname` `pwd`/LOG_FILES_PATH
+			chown -R `logname`.`logname` `pwd`/$LOG_FILES_PATH/
 			echo ""
 			
 			read -n 1 -s -r -p "Press any key to continue"

@@ -50,6 +50,7 @@ ANSIBLE_PWD="$2"
 PROG_USER_SELECTION="$3"
 SLAVE_FILE="$4"
 SHOW_EXPECT_SCRIPT_MSG="$5"
+LOG_FILES_PATH="$6"
 
 PROG_USER=`logname`
 PROG_USER_PWD="not set"
@@ -373,8 +374,8 @@ func_retrieve_slave_log_file(){
 
 	local IP=$1
 	echo ""
-	echo "sshpass -p $PROG_USER_PWD scp -o StrictHostKeyChecking=no $PROG_USER@$IP:~/$IP.log `pwd`/files_output"
-	sshpass -p $PROG_USER_PWD scp -o StrictHostKeyChecking=no $PROG_USER@$IP:~/$IP.log `pwd`/files_output
+	echo "sshpass -p $PROG_USER_PWD scp -o StrictHostKeyChecking=no $PROG_USER@$IP:~/$IP.log `pwd`/$LOG_FILES_PATH"
+	sshpass -p $PROG_USER_PWD scp -o StrictHostKeyChecking=no $PROG_USER@$IP:~/$IP.log `pwd`/$LOG_FILES_PATH
 }
 #===================================================================================================================
 func_remove_slave_log_file(){
@@ -409,9 +410,9 @@ func_execute_script_on_slave(){
 		NOTE:  This message will display one time for $PAUSE seconds.
 		---------------------------------------------------------------------------------------------------------------
 		The script expect-script.sh that is about to run has a timeout setting of $EXPECT_TIMEOUT seconds, in case the 
-			slave has a lot of files to yum update, upgrade, autoremove.
+			slave has a lot of files to yum update.
 
-		In reading about about using the Expect scripting language, timeouts as well as incorrect expectations of the 
+		In reading about using the Expect scripting language, timeouts as well as incorrect expectations of the 
 			remote system's response are frequent sources of error.
 			eg.  Your code expect a resonse of "abc", but "abc " is returned instead.
 
@@ -505,7 +506,7 @@ func_test_ansible_ssh(){
 	su -c './test-ansible-ssh.sh ansible 1' $ANSIBLE_UN
 
 	# make sure all of the ssh log files are owned by $PROG_USER
-	chown -R $PROG_USER.$PROG_USER `pwd`/files_output
+	chown -R $PROG_USER.$PROG_USER `pwd`/$LOG_FILES_PATH
 }
 
 #===================================================================================================================
