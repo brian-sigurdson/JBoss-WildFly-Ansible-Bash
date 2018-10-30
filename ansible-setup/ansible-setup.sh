@@ -83,9 +83,21 @@ func_update_system(){
 	yum update -y
 }
 #===================================================================================================================
-func_install_ansible_software(){
+func_install_other_software(){
 
-	# Install the Ansible software from the current repo, or add Ansible's repo, if desired.
+	# open-jdk, ant, ansible (use ansible's repo if desired)
+
+	for val in java ant; do
+		echo ""
+		echo "yum install -y " $val
+		echo ""
+		yum install -y $val
+	done
+}
+#===================================================================================================================
+func_install_ansible(){
+
+	# install ansible
 
 	echo ""
 	echo "yum install -y ansible"
@@ -98,8 +110,8 @@ func_create_ansible_user(){
 	# Create a user to run Ansible playbooks
 
 	echo ""
-	echo "adduser --quiet --disabled-password --shell /bin/bash --home /home/$ANSIBLE_UN --gecos 'User to run Ansible Playbooks' $ANSIBLE_UN"
-	adduser --quiet --disabled-password --shell /bin/bash --home "/home/$ANSIBLE_UN" --gecos "User to run Ansible Playbooks" "$ANSIBLE_UN"
+	echo "useradd --shell /bin/bash --home /home/$ANSIBLE_UN --comment 'User to run Ansible Playbooks' $ANSIBLE_UN"
+	useradd --shell /bin/bash --home "/home/$ANSIBLE_UN" --comment "User to run Ansible Playbooks" "$ANSIBLE_UN"
 
 	echo ""
 	echo "$ANSIBLE_UN:$ANSIBLE_PWD | chpasswd"
@@ -500,9 +512,11 @@ func_test_ansible_ssh(){
 func_menu_selection_1(){
 
 	# functions to run for menu selection 1
+	# prepare the master
 	func_print_script_info
 	func_update_system
-	func_install_ansible_software
+	func_install_ansible
+	func_install_other_software
 	func_create_ansible_user
 	func_set_ansible_sudoer_privileges
 	func_create_set_ssh_keys_localhost
@@ -544,6 +558,7 @@ func_run_on_slaves(){
 	# functions to run on the slave
 	func_print_script_info
 	func_update_system
+	func_install_other_software
 	func_install_python
 	func_create_ansible_user
 	func_set_ansible_sudoer_privileges

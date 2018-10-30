@@ -33,7 +33,7 @@ while [[ $REPLY != 0 ]]; do
 
 	echo ""
 	echo "-----------------------------------"
-	echo "           Ansible Setup"
+	echo "           Setup Menu"
 	echo "-----------------------------------"
 	echo "1) Master Setup"
 	echo "2) Slaves Setup (all)"
