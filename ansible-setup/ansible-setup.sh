@@ -68,11 +68,11 @@ func_print_script_info(){
 
 	echo ""
 	echo "###############################################"
-	echo "Script name:              $PROG_BASE_NAME"
-	echo "Script user:              $PROG_USER"
-	echo "Running as:               $USER"
-	echo "Running on:               `hostname -f`"
-	echo "IP-Address:               $HOST_IP"
+	echo "PROG_BASE_NAME:           $PROG_BASE_NAME"
+	echo "PROG_USER:                $PROG_USER"
+	echo "USER:                     $USER"
+	echo "hostname -f:              `hostname -f`"
+	echo "HOST_IP:                  $HOST_IP"
 	echo "ANSIBLE_UN:               $ANSIBLE_UN"
 	#echo "ANSIBLE_PWD:             $ANSIBLE_PWD"
 	echo "PROG_USER_SELECTION:      $PROG_USER_SELECTION"
@@ -351,11 +351,13 @@ func_send_public_key_to_slave(){
 	# but allow $PROG_USER to log into $PROG_USER's account on $IP with only a password
 	# .ssh and known_hosts will be removed and the origial .ssh put back, if exited, upon program completion
 
+	echo ""
+	echo "Calling func_send_public_key_to_slave()"
 	local IP=$1
 	local PUB_KEY_FILE=/home/$ANSIBLE_UN/.ssh/id_rsa.pub
 	
 	echo ""
-	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no $PUB_KEY_FILE PROG_USER@$IP:~"
+	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no $PUB_KEY_FILE $PROG_USER@$IP:~"
 	sshpass -p "$PROG_USER_PWD" scp -o StrictHostKeyChecking=no $PUB_KEY_FILE "$PROG_USER@$IP:~"
 }
 #===================================================================================================================
@@ -366,11 +368,12 @@ func_send_script_to_slave(){
 	# but allow $PROG_USER to log into $PROG_USER's account on $IP with only a password
 	# .ssh and known_hosts will be removed and the origial .ssh put back, if exited, upon program completion
 
+	echo ""
+	echo "calling func_send_script_to_slave()"
 	local IP=$1
 	echo ""
-	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no `pwd`/$PROG_BASE_NAME PROG_USER@$IP:~"
+	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no `pwd`/$PROG_BASE_NAME $PROG_USER@$IP:~"
 	sshpass -p "$PROG_USER_PWD" scp -o StrictHostKeyChecking=no `pwd`/$PROG_BASE_NAME "$PROG_USER@$IP:~"
-
 }
 #===================================================================================================================
 func_retrieve_slave_log_file(){
@@ -379,6 +382,8 @@ func_retrieve_slave_log_file(){
 	# the slave's log file to the master, just let the master retrieve it, since the master's .ssh directory
 	# is going to be replaced with it original .ssh, if it existed, anyway
 
+	echo ""
+	echo "Calling func_retrieve_slave_log_file()"
 	local IP=$1
 	echo ""
 	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no $PROG_USER@$IP:~/$IP.log $LOG_FILES_PATH"
@@ -387,6 +392,8 @@ func_retrieve_slave_log_file(){
 #===================================================================================================================
 func_remove_slave_log_file(){
 
+	echo ""
+	echo "Calling func_remove_slave_log_file()"
 	local IP=$1
 	echo ""
 	echo "sshpass -p PROG_USER_PWD ssh -o StrictHostKeyChecking=no $PROG_USER@$IP rm -f $IP.log"
@@ -402,6 +409,8 @@ func_execute_script_on_slave(){
 	# PROG_USER_SELECTION=3 is required to force slave to run proper functions
 	PROG_USER_SELECTION=3
 
+	echo ""
+	echo "Calling func_execute_script_on_slave()"
 	echo ""
 	echo "./expect-script.sh $ANSIBLE_UN $ANSIBLE_PWD $PROG_USER_SELECTION $SLAVE_FILE $REMOTE_IP $PROG_USER $PROG_USER_PWD $EXPECT_TIMEOUT $SHOW_EXPECT_SCRIPT_MSG"
 	echo ""
@@ -457,11 +466,12 @@ func_ssh-keyscan_ansible(){
 	# run the keyscan command again, but this time collect the keys asociated with the ip addresses
 
 	# get the ip v4 version
-	IPV4=getent hosts | cut -d' ' -f1
+	#IPV4=getent hosts | cut -d' ' -f1
+	getent hosts | cut -d' ' -f1 > /tmp/ipv4.txt
 
 	echo ""
-	echo "running:  ssh-keyscan -4 $IPV4 >> /home/$ANSIBLE_UN/.ssh/known_hosts"
-	ssh-keyscan -4 -f "$IPV4" >> "/home/$ANSIBLE_UN/.ssh/known_hosts"
+	echo "running:  ssh-keyscan -4 /tmp/ipv4.txt >> /home/$ANSIBLE_UN/.ssh/known_hosts"
+	ssh-keyscan -4 -f /tmp/ipv4.txt >> "/home/$ANSIBLE_UN/.ssh/known_hosts"
 
 }
 #===================================================================================================================
