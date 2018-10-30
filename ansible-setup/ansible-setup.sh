@@ -67,12 +67,19 @@ func_print_script_info(){
 
 	echo ""
 	echo "###############################################"
-	echo "Script name:	$PROG_BASE_NAME"
-	echo "Script user:	$PROG_USER"
-	echo "Running as:	$USER"
-	echo "Running on:	`hostname -f`"
-	echo "IP-Address:	$HOST_IP"
-	echo "Slave File:	$SLAVE_FILE"
+	echo "Script name:				$PROG_BASE_NAME"
+	echo "Script user:				$PROG_USER"
+	echo "Running as:				$USER"
+	echo "Running on:				`hostname -f`"
+	echo "IP-Address:				$HOST_IP"
+	echo "ANSIBLE_UN:				$ANSIBLE_UN"
+	#echo "ANSIBLE_PWD:				$ANSIBLE_PWD"
+	echo "PROG_USER_SELECTION:		$PROG_USER_SELECTION"
+	#echo "PROG_USER_PWD:			$PROG_USER_PWD"
+	echo "SLAVE_FILE:				$SLAVE_FILE"
+	echo "SHOW_EXPECT_SCRIPT_MSG:	$SHOW_EXPECT_SCRIPT_MSG"
+	echo "LOG_FILES_PATH: 			$LOG_FILES_PATH"
+	echo "SLAVE_FILE:				$SLAVE_FILE"
 	echo "###############################################"
 	echo ""
 }
@@ -252,9 +259,9 @@ func_install_sshpass(){
 func_remove_sshpass(){
 
 	echo ""
-	echo "yum purge -y sshpass"
+	echo "yum remove -y sshpass"
 	echo ""
-	yum purge -y sshpass
+	yum remove -y sshpass
 }
 #===================================================================================================================
 func_install_expect(){
@@ -270,9 +277,9 @@ func_install_expect(){
 func_remove_expect(){
 
 	echo ""
-	echo "yum purge -y expect"
+	echo "yum remove -y expect"
 	echo ""
-	yum purge -y expect
+	yum remove -y expect
 }
 #===================================================================================================================
 func_remove_public_key_file(){
@@ -315,10 +322,11 @@ func_create_copy_user_ssh_dir(){
 		cp -r /home/$PROG_USER/.ssh /home/$PROG_USER/.ssh_prior
 	else 
 		# setup temporary .ssh
-		mkdir /home/$PROG_USER/.ssh
-		chmod 700 /home/$PROG_USER/.ssh
-		chown $PROG_USER.$PROG_USER /home/$PROG_USER/.ssh
+		mkdir /home/$PROG_USER/.ssh		
 	fi
+
+	chmod 700 /home/$PROG_USER/.ssh		
+	chown $PROG_USER.$PROG_USER /home/$PROG_USER/.ssh
 }
 #===================================================================================================================
 func_delete_copy_user_ssh_dir(){
@@ -330,6 +338,9 @@ func_delete_copy_user_ssh_dir(){
 	if [ -d /home/$PROG_USER/.ssh_prior ]; then
 		mv /home/$PROG_USER/.ssh_prior /home/$PROG_USER/.ssh
 	fi
+	
+	chmod 700 /home/$PROG_USER/.ssh		
+	chown $PROG_USER.$PROG_USER /home/$PROG_USER/.ssh
 }
 #===================================================================================================================
 func_send_public_key_to_slave(){
@@ -343,7 +354,7 @@ func_send_public_key_to_slave(){
 	local PUB_KEY_FILE=/home/$ANSIBLE_UN/.ssh/id_rsa.pub
 	
 	echo ""
-	echo "sshpass -p $PROG_USER_PWD scp -o StrictHostKeyChecking=no $PUB_KEY_FILE $PROG_USER@$IP:~"
+	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no $PUB_KEY_FILE PROG_USER@$IP:~"
 	sshpass -p "$PROG_USER_PWD" scp -o StrictHostKeyChecking=no $PUB_KEY_FILE "$PROG_USER@$IP:~"
 }
 #===================================================================================================================
@@ -356,7 +367,7 @@ func_send_script_to_slave(){
 
 	local IP=$1
 	echo ""
-	echo "sshpass -p $PROG_USER_PWD scp -o StrictHostKeyChecking=no `pwd`/$PROG_BASE_NAME $PROG_USER@$IP:~"
+	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no `pwd`/$PROG_BASE_NAME PROG_USER@$IP:~"
 	sshpass -p "$PROG_USER_PWD" scp -o StrictHostKeyChecking=no `pwd`/$PROG_BASE_NAME "$PROG_USER@$IP:~"
 
 }
@@ -369,7 +380,7 @@ func_retrieve_slave_log_file(){
 
 	local IP=$1
 	echo ""
-	echo "sshpass -p $PROG_USER_PWD scp -o StrictHostKeyChecking=no $PROG_USER@$IP:~/$IP.log `pwd`/$LOG_FILES_PATH"
+	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no PROG_USER@$IP:~/$IP.log `pwd`/$LOG_FILES_PATH"
 	sshpass -p $PROG_USER_PWD scp -o StrictHostKeyChecking=no $PROG_USER@$IP:~/$IP.log `pwd`/$LOG_FILES_PATH
 }
 #===================================================================================================================
@@ -377,7 +388,7 @@ func_remove_slave_log_file(){
 
 	local IP=$1
 	echo ""
-	echo "sshpass -p $PROG_USER_PWD ssh -o StrictHostKeyChecking=no $PROG_USER@$IP rm -f $IP.log"
+	echo "sshpass -p PROG_USER_PWD ssh -o StrictHostKeyChecking=no PROG_USER@$IP rm -f $IP.log"
 	sshpass -p $PROG_USER_PWD ssh -o StrictHostKeyChecking=no $PROG_USER@$IP "rm -f $IP.log"
 }
 
@@ -385,7 +396,7 @@ func_remove_slave_log_file(){
 func_execute_script_on_slave(){
 
 	local REMOTE_IP=$1
-	local PAUSE=35
+	local PAUSE=30
 	local EXPECT_TIMEOUT=120
 	# PROG_USER_SELECTION=3 is required to force slave to run proper functions
 	PROG_USER_SELECTION=3
@@ -457,6 +468,7 @@ func_setup_slaves(){
 
 	# process nodes
 	echo ""
+	echo "Processing file: $SLAVE_FILE"
 	for NODE in `cat $SLAVE_FILE`; do
 		echo ""
 		echo "Processing: $NODE"
@@ -516,15 +528,18 @@ func_menu_selection_1(){
 	func_create_ansible_user
 	func_set_ansible_sudoer_privileges
 	func_create_set_ssh_keys_localhost
-}
+
+	# this was previously two functions.
+	# merge for now.
+#}
 #===================================================================================================================
-func_menu_selection_2(){
+#func_menu_selection_2(){
 
 	# function to run for menu selection 2 
 	# preparing the master to setup the slaves
 
 	# 1) print info & get password
-	func_print_script_info
+	#func_print_script_info
 	#func_get_user_passwd
 
 	# 2) prepare master for slave update
@@ -540,7 +555,7 @@ func_menu_selection_2(){
 
 	# 5) unprepare master for slave update
 	func_delete_copy_user_ssh_dir
-	func_remove_sshpass
+	# func_remove_sshpass
 	func_remove_public_key_file
 
 	# 6) test that the user ansible can ssh into all nodes (master and slaves)
@@ -569,8 +584,8 @@ case $PROG_USER_SELECTION in
 	1) 	func_menu_selection_1
 		;;
 
-	2) 	func_menu_selection_2
-		;;
+	#2) 	func_menu_selection_2
+	#	;;
 
 	3)	func_run_on_slaves	
 		;;
