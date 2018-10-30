@@ -73,9 +73,6 @@ func_test_password_file(){
     fi    
 }
 
-func_test_slaves_ip_address
-func_test_password_file
-
 #########################################################################################################
 # ansible setup
 #########################################################################################################
@@ -83,77 +80,86 @@ func_test_password_file
 # A user called "ansible", with sudoer privileges, will be created on all nodes.
 
 # variable needed for the ansible setup scripts
-PATH_TO_LOG_FILES_DIR=$PATH_TO_ANSIBLE_SETUP_FILES_DIR/output
-MASTER_LOG_FILE_NAME=master-log.txt
-PATH_TO_MASTER_LOG_FILE=$PATH_TO_LOG_FILES_DIR/$MASTER_LOG_FILE_NAME
+func_ansible_setup(){
+    PATH_TO_LOG_FILES_DIR=$PATH_TO_ANSIBLE_SETUP_FILES_DIR/output
+    MASTER_LOG_FILE_NAME=master-log.txt
+    PATH_TO_MASTER_LOG_FILE=$PATH_TO_LOG_FILES_DIR/$MASTER_LOG_FILE_NAME
 
-# parameters to ansible setup script
-#1
-ANSIBLE_UN="ansible"
-# echo "ansible un = "$ANSIBLE_UN
-#2
-ANSIBLE_PWD="ansible"
-# echo "ansible pwd = "$ANSIBLE_PWD
-#3
-# 1=setup master
-PROG_USER_SELECTION=1 
-# echo "user selection = " $PROG_USER_SELECTION
-#4
-PROG_USER_PWD=`grep -v -e '^$' $PATH_TO_PASSWORD_FILE`
-# echo "user pwd = " $PROG_USER_PWD
-#5
-# echo "slave_file = " $PATH_TO_SLAVES_FILE
-#6
-SHOW_EXPECT_SCRIPT_MSG=0
-# echo "show expect script msg = " $SHOW_EXPECT_SCRIPT_MSG
-#7
-LOG_FILES_PATH=$PATH_TO_LOG_FILES_DIR
-# echo "log files path = " $LOG_FILES_PATH
-#8
-# echo "PATH_TO_ANSIBLE_SETUP_FILES_DIR = " $PATH_TO_ANSIBLE_SETUP_FILES_DIR
+    # parameters to ansible setup script
+    #1
+    ANSIBLE_UN="ansible"
+    # echo "ansible un = "$ANSIBLE_UN
+    #2
+    ANSIBLE_PWD="ansible"
+    # echo "ansible pwd = "$ANSIBLE_PWD
+    #3
+    # 1=setup master
+    PROG_USER_SELECTION=1 
+    # echo "user selection = " $PROG_USER_SELECTION
+    #4
+    PROG_USER_PWD=`grep -v -e '^$' $PATH_TO_PASSWORD_FILE`
+    # echo "user pwd = " $PROG_USER_PWD
+    #5
+    # echo "slave_file = " $PATH_TO_SLAVES_FILE
+    #6
+    SHOW_EXPECT_SCRIPT_MSG=0
+    # echo "show expect script msg = " $SHOW_EXPECT_SCRIPT_MSG
+    #7
+    LOG_FILES_PATH=$PATH_TO_LOG_FILES_DIR
+    # echo "log files path = " $LOG_FILES_PATH
+    #8
+    # echo "PATH_TO_ANSIBLE_SETUP_FILES_DIR = " $PATH_TO_ANSIBLE_SETUP_FILES_DIR
 
-echo "`date`" > /tmp/1-ansible-setup-begin.txt
+    echo "`date`" > /tmp/1-ansible-setup-begin.txt
 
-# start ansible setup script with parameters
-$PATH_TO_ANSIBLE_SETUP_FILE \
-    $ANSIBLE_UN \
-    $ANSIBLE_PWD \
-    $PROG_USER_SELECTION \
-    $PROG_USER_PWD \
-    $PATH_TO_SLAVES_FILE \
-    $SHOW_EXPECT_SCRIPT_MSG \
-    $LOG_FILES_PATH \
-    $PATH_TO_ANSIBLE_SETUP_FILES_DIR | tee -a /tmp/ansible-setup1.log
+    # start ansible setup script with parameters
+    $PATH_TO_ANSIBLE_SETUP_FILE \
+        $ANSIBLE_UN \
+        $ANSIBLE_PWD \
+        $PROG_USER_SELECTION \
+        $PROG_USER_PWD \
+        $PATH_TO_SLAVES_FILE \
+        $SHOW_EXPECT_SCRIPT_MSG \
+        $LOG_FILES_PATH \
+        $PATH_TO_ANSIBLE_SETUP_FILES_DIR | tee -a /tmp/ansible-setup1.log
 
-echo "`date`" > /tmp/1-ansible-setup-end.txt
+    echo "`date`" > /tmp/1-ansible-setup-end.txt
+
+    # copy needed files and directories to ansible's home dir and set ownership
+    ANSIBLE_HOME=/home/$ANSIBLE_UN
+    ANSIBLE_LOCAL_HOSTS_DIR=$ANSIBLE_HOME/local_hosts
+    ANSIBLE_LOCAL_HOSTS_FILE=$ANSIBLE_LOCAL_HOSTS_DIR/hosts
+
+    mkdir $ANSIBLE_LOCAL_HOSTS_DIR
+    mkdir $ANSIBLE_HOME/local_config
+
+    cp $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_hosts/* $ANSIBLE_LOCAL_HOSTS_DIR
+    cp $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_config/* $ANSIBLE_HOME/local_config/
+    ln -s $ANSIBLE_HOME/local_config/ansible.cfg $ANSIBLE_HOME/ansible.cfg
+    
+    # set the ansible hosts file, for the software to know what nodes we'll manage
+    echo "[master]" > $ANSIBLE_LOCAL_HOSTS_FILE
+    echo `hostname -i` >> $ANSIBLE_LOCAL_HOSTS_FILE
+    echo "" >> $ANSIBLE_LOCAL_HOSTS_FILE
+
+    # let ansible know which nodes are the slaves
+    echo "[slaves]" >> $ANSIBLE_LOCAL_HOSTS_FILE
+    echo `cat $PATH_TO_SLAVES_FILE` >> $ANSIBLE_LOCAL_HOSTS_FILE
+    echo "" >> $ANSIBLE_LOCAL_HOSTS_FILE
+
+    chown -R $ANSIBLE_UN.$ANSIBLE_PWD $ANSIBLE_HOME
+}
 
 #########################################################################################################
 
-# prepare hadoop for installation, rename and move ansible dir
-# mv /tmp/ansible-master /tmp/ansible
-# mv /tmp/ansible /home/ansible/
-# chown -R ansible.ansible /home/ansible
+echo "`date`" > /tmp/2-jboss-wildfly-setup-begin.txt
 
-# # setup / format the disk drive (not hadoop formatting).
-# $PATH_TO_CL_ANSIBLE/init-hdfs.sh
-
-# # slave nodes stop here
-# if [ -z "$SLAVE_NAME_PREFIX" ];then
-# 	# slave nodes will have a null prefix and if a master node cannot have a null prefix, then it
-# 	# should stop also
-# 	exit 1
-# fi
-
-# #########################################################################################################
-
-# echo "`date`" > /tmp/2-hadoop-setup-begin.txt
-
-# # to be sure ansible owns everything in /home/ansible before starting script
-# chown -R ansible.ansible /home/ansible
+# before we start using ansible, be sure it owns everything in is home dir
+chown -R $ANSIBLE_UN.$ANSIBLE_PWD $ANSIBLE_HOME
 
 # su - ansible -c "$PATH_TO_CL_ANSIBLE/hadoop-setup.sh $HADOOP_VERSION $MASTER_NAME $SLAVE_NAME_PREFIX $PATH_TO_ANSIBLE_DIR $NUM_SLAVES"
 
-# echo "`date`" > /tmp/2-hadoop-setup-end.txt
+echo "`date`" > /tmp/2-jboss-wildfly-setup-end.txt
 
 # ########################################################################################################
 
@@ -174,3 +180,10 @@ echo "`date`" > /tmp/1-ansible-setup-end.txt
 # echo "`date`" > /tmp/4-drupal-setup-end.txt
 
 # #########################################################################################################
+
+#########################################################################################################
+# execute functions
+#########################################################################################################
+# func_test_slaves_ip_address
+# func_test_password_file
+# func_ansible_setup
