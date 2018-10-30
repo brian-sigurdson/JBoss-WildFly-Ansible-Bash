@@ -326,8 +326,12 @@ func_create_copy_user_ssh_dir(){
 		mkdir /home/$PROG_USER/.ssh		
 	fi
 
+	echo ""
+	echo "chmod 700 /home/$PROG_USER/.ssh		"
 	chmod 700 /home/$PROG_USER/.ssh		
-	chown $PROG_USER.$PROG_USER /home/$PROG_USER/.ssh
+	echo ""
+	echo "chown -R $PROG_USER.$PROG_USER /home/$PROG_USER/.ssh"
+	chown -R $PROG_USER.$PROG_USER /home/$PROG_USER/.ssh
 }
 #===================================================================================================================
 func_delete_copy_user_ssh_dir(){
@@ -340,8 +344,12 @@ func_delete_copy_user_ssh_dir(){
 		mv /home/$PROG_USER/.ssh_prior /home/$PROG_USER/.ssh
 	fi
 	
-	chmod 700 /home/$PROG_USER/.ssh		
-	chown $PROG_USER.$PROG_USER /home/$PROG_USER/.ssh
+	echo ""
+	echo "chmod 700 /home/$PROG_USER/.ssh"
+	chmod 700 /home/$PROG_USER/.ssh	
+	echo ""
+	echo "chown -R $PROG_USER.$PROG_USER /home/$PROG_USER/.ssh"
+	chown -R $PROG_USER.$PROG_USER /home/$PROG_USER/.ssh
 }
 #===================================================================================================================
 func_send_public_key_to_slave(){
@@ -372,8 +380,8 @@ func_send_script_to_slave(){
 	echo "calling func_send_script_to_slave()"
 	local IP=$1
 	echo ""
-	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no `pwd`/$PROG_BASE_NAME $PROG_USER@$IP:~"
-	sshpass -p "$PROG_USER_PWD" scp -o StrictHostKeyChecking=no `pwd`/$PROG_BASE_NAME "$PROG_USER@$IP:~"
+	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no $PATH_TO_ANSIBLE_SETUP_FILES_DIR/$PROG_BASE_NAME $PROG_USER@$IP:~"
+	sshpass -p "$PROG_USER_PWD" scp -o StrictHostKeyChecking=no $PATH_TO_ANSIBLE_SETUP_FILES_DIR/$PROG_BASE_NAME "$PROG_USER@$IP:~"
 }
 #===================================================================================================================
 func_retrieve_slave_log_file(){
@@ -412,7 +420,7 @@ func_execute_script_on_slave(){
 	echo ""
 	echo "Calling func_execute_script_on_slave()"
 	echo ""
-	echo "./expect-script.sh $ANSIBLE_UN $ANSIBLE_PWD $PROG_USER_SELECTION $SLAVE_FILE $REMOTE_IP $PROG_USER $PROG_USER_PWD $EXPECT_TIMEOUT $SHOW_EXPECT_SCRIPT_MSG"
+	echo "$PATH_TO_ANSIBLE_SETUP_FILES_DIR/expect-script.sh $ANSIBLE_UN $ANSIBLE_PWD $PROG_USER_SELECTION $SLAVE_FILE $REMOTE_IP $PROG_USER PROG_USER_PWD $EXPECT_TIMEOUT $SHOW_EXPECT_SCRIPT_MSG"
 	echo ""
 
 	# if this is the first slave, then show the message
@@ -449,7 +457,16 @@ func_execute_script_on_slave(){
 		sleep $PAUSE
 	fi
 
-	./expect-script.sh $ANSIBLE_UN $ANSIBLE_PWD $PROG_USER_SELECTION $SLAVE_FILE $REMOTE_IP $PROG_USER $PROG_USER_PWD $EXPECT_TIMEOUT $SHOW_EXPECT_SCRIPT_MSG
+	$PATH_TO_ANSIBLE_SETUP_FILES_DIR/expect-script.sh \
+		$ANSIBLE_UN \
+		$ANSIBLE_PWD \
+		$PROG_USER_SELECTION \
+		$SLAVE_FILE \
+		$REMOTE_IP \
+		$PROG_USER \
+		$PROG_USER_PWD \
+		$EXPECT_TIMEOUT \
+		$SHOW_EXPECT_SCRIPT_MSG
 }
 #===================================================================================================================
 func_ssh-keyscan_ansible(){
@@ -519,17 +536,19 @@ func_test_ansible_ssh(){
 	echo ""
 
 	# change into the directory that contains the ansible scripts
-	# su -c below doesn't process variables, as single quotes are required, so you need to be in the dir first
 	cd $PATH_TO_ANSIBLE_SETUP_FILES_DIR
 
+	# unusual error message about permissions, this shouldn't be, force 777
+	chmod 777 $PATH_TO_ANSIBLE_SETUP_FILES_DIR/expect-script-test-ssh.sh
+
 	# process the master
-	su -c './test-ansible-ssh.sh ansible' 0 $ANSIBLE_UN $LOG_FILES_PATH
+	su -c "./test-ansible-ssh.sh $ANSIBLE_UN 0 $LOG_FILES_PATH $PATH_TO_ANSIBLE_SETUP_FILES_DIR" $ANSIBLE_UN 
 
 	# process slaves
-	su -c './test-ansible-ssh.sh ansible' 1 $ANSIBLE_UN $LOG_FILES_PATH
+	su -c "./test-ansible-ssh.sh $ANSIBLE_UN 1 $LOG_FILES_PATH $PATH_TO_ANSIBLE_SETUP_FILES_DIR" $ANSIBLE_UN
 
 	# make sure all of the ssh log files are owned by $PROG_USER
-	chown -R $PROG_USER.$PROG_USER `pwd`/$LOG_FILES_PATH
+	chown -R $PROG_USER.$PROG_USER $LOG_FILES_PATH
 }
 
 #===================================================================================================================

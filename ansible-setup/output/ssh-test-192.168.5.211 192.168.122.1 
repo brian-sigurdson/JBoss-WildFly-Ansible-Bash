@@ -1,0 +1,5 @@
+spawn ssh ansible@192.168.5.211
+The authenticity of host '192.168.5.211 (192.168.5.211)' can't be established.
+ECDSA key fingerprint is SHA256:pQHb7qmzBav4Y0BWQq6+CXMBxNO7Ovbw4XvMb54ED0M.
+ECDSA key fingerprint is MD5:24:84:d9:4f:7c:6d:bf:ff:a7:8f:37:53:7f:03:96:22.
+Are you sure you want to continue connecting (yes/no)? expect-script-test-ssh.sh timed out at:  expect "$ " #1
