@@ -54,6 +54,7 @@ PROG_USER_PWD="$4"
 SLAVE_FILE="$5"
 SHOW_EXPECT_SCRIPT_MSG="$6"
 LOG_FILES_PATH="$7"
+PATH_TO_ANSIBLE_SETUP_FILES_DIR="$8"
 
 PROG_USER=`logname`
 HOST_IP=`hostname -i`
@@ -505,6 +506,10 @@ func_test_ansible_ssh(){
 
 	echo ""
 	echo "** Testing passwordless ssh for user $ANSIBLE_UN **"
+
+	# change into the directory that contains the ansible scripts
+	# su -c below doesn't process variables, as single quotes are required, so you need to be in the dir first
+	cd $PATH_TO_ANSIBLE_SETUP_FILES_DIR
 
 	# process the master
 	su -c './test-ansible-ssh.sh ansible 0' $ANSIBLE_UN
