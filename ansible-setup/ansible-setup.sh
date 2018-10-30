@@ -45,16 +45,18 @@
 # globals
 PROG_NAME="$0"
 PROG_BASE_NAME=$(basename $0)
+
 ANSIBLE_UN="$1"
 ANSIBLE_PWD="$2"
+
 PROG_USER_SELECTION="$3"
-SLAVE_FILE="$4"
-SHOW_EXPECT_SCRIPT_MSG="$5"
-LOG_FILES_PATH="$6"
+PROG_USER_PWD="$4"
+SLAVE_FILE="$5"
+SHOW_EXPECT_SCRIPT_MSG="$6"
+LOG_FILES_PATH="$7"
 
 PROG_USER=`logname`
-PROG_USER_PWD="not set"
-HOST_IP=`hostname -I`
+HOST_IP=`hostname -i`
 HOST_NAME=`hostname`
 HOST_NAME_SHORT=`hostname -s`
 
@@ -69,7 +71,9 @@ func_print_script_info(){
 	echo "Script user:	$PROG_USER"
 	echo "Running as:	$USER"
 	echo "Running on:	`hostname -f`"
-	echo "IP-Address:	$HOST_IP"	
+	echo "IP-Address:	$HOST_IP"
+	echo "Num Slaves:	$NUM_SLAVES"
+	echo "Slave File:	$SLAVE_FILE"
 	echo "###############################################"
 	echo ""
 }

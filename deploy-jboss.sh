@@ -4,25 +4,6 @@
 # To manage the deployment of jboss/wildfly to one or more managed (slave) nodes.
 #
 #########################################################################################################
-
-# gather global vals
-PATH_TO_ANSIBLE_SETUP_FILES=./ansible-setup
-ANSIBLE_SETUP_FILE_NAME=ansible-setup.sh
-
-PATH_TO_SLAVES_FILE=$PATH_TO_ANSIBLE_SETUP_FILES
-SLAVE_FILE_NAME=slaves.txt
-PASSWORD_FILE_NAME=password.txt
-
-
-
-# MASTER_IP_ADDRESS=`hostname --ip-address`
-# NUM_SLAVES=$3
-
-# PATH_TO_CL_TMP=/tmp/ansible-master/cloudlab
-# PATH_TO_ANSIBLE_DIR=/home/ansible/ansible
-
-
-#########################################################################################################
 # check input data
 #########################################################################################################
 # check that the user has added the ip addresses to the slaves.txt file
@@ -46,6 +27,7 @@ func_test_slaves_ip_address(){
         exit 1
     fi
 }
+
 # check that the user has added their to the password.txt file
 func_test_password_file(){
     echo ""
@@ -75,12 +57,49 @@ func_test_password_file
 # ansible setup
 #########################################################################################################
 
-# install the necessary software on this (master) node, and managed (slave) nodes.
-# a user called "ansible", with sudoer privileges, will be created on all nodes.
+# This script will install the necessary software on this (master) node, and managed (slave) nodes.
+# A user called "ansible", with sudoer privileges, will be created on all nodes.
+
+# variable needed for the ansible setup scripts
+PATH_TO_ANSIBLE_SETUP_FILES=`pwd`/ansible-setup
+ANSIBLE_SETUP_FILE_NAME=ansible-setup.sh
+
+PATH_TO_SLAVES_FILE=$PATH_TO_ANSIBLE_SETUP_FILES
+SLAVE_FILE_NAME=slaves.txt
+
+PATH_TO_PASSWORD_FILE=$PATH_TO_ANSIBLE_SETUP_FILES
+PASSWORD_FILE_NAME=password.txt
+
+PATH_TO_LOG_FILES_DIR=$PATH_TO_ANSIBLE_SETUP_FILES/output
+MASTER_LOG_FILE_NAME=master-log.txt
+PATH_TO_MASTER_LOG_FILE=$PATH_TO_LOG_FILES_DIR/$MASTER_LOG_FILE_NAME
+
+# parameters to ansible setup script
+ANSIBLE_UN="ansible"
+ANSIBLE_PWD="ansible"
+NUM_SLAVES=`grep -v -e '^$' ansible-setup/slaves.txt | wc -l`
+echo "NUM_SLAVES="$NUM_SLAVES
+
+SLAVE_FILE=$PATH_TO_PASSWORD_FILE/$PASSWORD_FILE_NAME
+echo "slave_file = " $SLAVE_FILE
+
+PROG_USER_SELECTION=
+echo "user selection = " $PROG_USER_SELECTION
+
+PROG_USER_PWD=grep -v -e '^$' ansible-setup/password.txt
+echo "user pwd = " $PROG_USER_PWD
+
+SLAVE_FILE=$PATH_TO_SLAVES_FILE/$SLAVE_FILE_NAME
+echo "slave file = " $SLAVE_FILE
+
+SHOW_EXPECT_SCRIPT_MSG=0
+echo "show expect script msg = " $SHOW_EXPECT_SCRIPT_MSG
+
+LOG_FILES_PATH=$PATH_TO_LOG_FILES_DIR
 
 echo "`date`" > /tmp/1-ansible-setup-begin.txt
 
-$PATH_TO_ANSIBLE_SETUP  $MASTER_IP_ADDRESS $NUM_SLAVES | tee -a /tmp/ansible-setup.log
+$PATH_TO_ANSIBLE_SETUP $ANSIBLE_UN $ANSIBLE_PWD $NUM_SLAVES usersel? $PROG_USER_PWD $SLAVE_FILE $SHOW_EXPECT_SCRIPT_MSG $LOG_FILES_PATH | tee -a /tmp/ansible-setup.log
 
 echo "`date`" > /tmp/1-ansible-setup-end.txt
 
@@ -90,6 +109,16 @@ echo "`date`" > /tmp/1-ansible-setup-end.txt
 mv /tmp/ansible-master /tmp/ansible
 mv /tmp/ansible /home/ansible/
 chown -R ansible.ansible /home/ansible
+
+
+
+
+
+
+
+
+
+
 
 # setup / format the disk drive (not hadoop formatting).
 $PATH_TO_CL_ANSIBLE/init-hdfs.sh
