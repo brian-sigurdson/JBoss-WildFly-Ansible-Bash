@@ -64,18 +64,18 @@ Generating public/private rsa key pair.
 Your identification has been saved in /home/ansible/.ssh/id_rsa.
 Your public key has been saved in /home/ansible/.ssh/id_rsa.pub.
 The key fingerprint is:
-SHA256:wjmoIT3QfHd6XKAT5vJpkMGS2S7lc/sbMDgOTGpsgeg root@wildfly1
+SHA256:w1uMM7jMsZqLvTjbWe3vnJqrTMu+1IyRjCvYUfK58AE root@wildfly1
 The key's randomart image is:
 +---[RSA 2048]----+
-|   =. o .        |
-|oo+ += o .       |
-|+.+== = . .      |
-|o*o.+O.B .       |
-|oE*.+o%.S        |
-|o. * o.*         |
-|  . .  ..        |
-|        ..       |
-|        ..       |
+|                 |
+|                 |
+|  E .            |
+|   = + + o       |
+|  o = * S o      |
+| o + * X *       |
+|. o + X =        |
+|  .* X o o .     |
+|  +oO+Bo===      |
 +----[SHA256]-----+
 
 sed -i s/root/ansible/g /home/ansible/.ssh/id_rsa.pub

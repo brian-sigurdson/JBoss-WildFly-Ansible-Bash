@@ -1,0 +1,167 @@
+
+###############################################
+Script name:	ansible-setup.sh
+Script user:	brians
+Running as:	root
+Running on:	wildfly2
+IP-Address:	192.168.5.212 192.168.122.1 
+###############################################
+
+
+yum update -y
+
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: mirror.cisp.com
+ * extras: mirror.cisp.com
+ * updates: centos.servint.com
+No packages marked for update
+
+yum install -y  java
+
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: mirror.cisp.com
+ * extras: mirror.cisp.com
+ * updates: centos.servint.com
+Package 1:java-1.8.0-openjdk-1.8.0.191.b12-0.el7_5.x86_64 already installed and latest version
+Nothing to do
+
+yum install -y  ant
+
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: mirror.cisp.com
+ * extras: mirror.cisp.com
+ * updates: centos.servint.com
+Resolving Dependencies
+--> Running transaction check
+---> Package ant.noarch 0:1.9.2-9.el7 will be installed
+--> Processing Dependency: java-devel >= 1.5.0 for package: ant-1.9.2-9.el7.noarch
+--> Processing Dependency: xml-commons-apis for package: ant-1.9.2-9.el7.noarch
+--> Processing Dependency: xerces-j2 for package: ant-1.9.2-9.el7.noarch
+--> Running transaction check
+---> Package java-1.8.0-openjdk-devel.x86_64 1:1.8.0.191.b12-0.el7_5 will be installed
+---> Package xerces-j2.noarch 0:2.11.0-17.el7_0 will be installed
+--> Processing Dependency: xml-commons-resolver >= 1.2 for package: xerces-j2-2.11.0-17.el7_0.noarch
+--> Processing Dependency: xalan-j2 >= 2.7.1 for package: xerces-j2-2.11.0-17.el7_0.noarch
+--> Processing Dependency: osgi(org.apache.xml.serializer) for package: xerces-j2-2.11.0-17.el7_0.noarch
+--> Processing Dependency: osgi(org.apache.xml.resolver) for package: xerces-j2-2.11.0-17.el7_0.noarch
+---> Package xml-commons-apis.noarch 0:1.4.01-16.el7 will be installed
+--> Running transaction check
+---> Package xalan-j2.noarch 0:2.7.1-23.el7 will be installed
+---> Package xml-commons-resolver.noarch 0:1.2-15.el7 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package                    Arch     Version                    Repository
+                                                                           Size
+================================================================================
+Installing:
+ ant                        noarch   1.9.2-9.el7                base      1.9 M
+Installing for dependencies:
+ java-1.8.0-openjdk-devel   x86_64   1:1.8.0.191.b12-0.el7_5    updates   9.8 M
+ xalan-j2                   noarch   2.7.1-23.el7               base      1.9 M
+ xerces-j2                  noarch   2.11.0-17.el7_0            base      1.1 M
+ xml-commons-apis           noarch   1.4.01-16.el7              base      227 k
+ xml-commons-resolver       noarch   1.2-15.el7                 base      108 k
+
+Transaction Summary
+================================================================================
+Install  1 Package (+5 Dependent packages)
+
+Total download size: 15 M
+Installed size: 46 M
+Downloading packages:
+--------------------------------------------------------------------------------
+Total                                              6.2 MB/s |  15 MB  00:02     
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : xml-commons-apis-1.4.01-16.el7.noarch                        1/6 
+  Installing : xml-commons-resolver-1.2-15.el7.noarch                       2/6 
+  Installing : xalan-j2-2.7.1-23.el7.noarch                                 3/6 
+  Installing : xerces-j2-2.11.0-17.el7_0.noarch                             4/6 
+  Installing : 1:java-1.8.0-openjdk-devel-1.8.0.191.b12-0.el7_5.x86_64      5/6 
+  Installing : ant-1.9.2-9.el7.noarch                                       6/6 
+  Verifying  : xml-commons-apis-1.4.01-16.el7.noarch                        1/6 
+  Verifying  : xml-commons-resolver-1.2-15.el7.noarch                       2/6 
+  Verifying  : ant-1.9.2-9.el7.noarch                                       3/6 
+  Verifying  : xalan-j2-2.7.1-23.el7.noarch                                 4/6 
+  Verifying  : xerces-j2-2.11.0-17.el7_0.noarch                             5/6 
+  Verifying  : 1:java-1.8.0-openjdk-devel-1.8.0.191.b12-0.el7_5.x86_64      6/6 
+
+Installed:
+  ant.noarch 0:1.9.2-9.el7                                                      
+
+Dependency Installed:
+  java-1.8.0-openjdk-devel.x86_64 1:1.8.0.191.b12-0.el7_5                       
+  xalan-j2.noarch 0:2.7.1-23.el7                                                
+  xerces-j2.noarch 0:2.11.0-17.el7_0                                            
+  xml-commons-apis.noarch 0:1.4.01-16.el7                                       
+  xml-commons-resolver.noarch 0:1.2-15.el7                                      
+
+Complete!
+
+yum install -y python
+
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: mirror.cisp.com
+ * extras: mirror.cisp.com
+ * updates: centos.servint.com
+Package python-2.7.5-69.el7_5.x86_64 already installed and latest version
+Nothing to do
+
+useradd --shell /bin/bash --home /home/ansible --comment 'User to run Ansible Playbooks' ansible
+
+ansible:ansible | chpasswd
+
+ansible ALL=(ALL:ALL) NOPASSWD: ALL > /etc/sudoers.d/ansible
+
+chmod 0440 /etc/sudoers.d/ansible
+
+mkdir -p /home/ansible/.ssh
+
+chmod 700 /home/ansible/.ssh
+
+ssh-keygen -v -b 2048 -t rsa -f /home/ansible/.ssh/id_rsa -N ''
+Generating public/private rsa key pair.
+Your identification has been saved in /home/ansible/.ssh/id_rsa.
+Your public key has been saved in /home/ansible/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:ytnOARx/HJ6C0Ntp9IMrO99r180xN49fVh8rv3YVN9M root@wildfly2
+The key's randomart image is:
++---[RSA 2048]----+
+|                 |
+|     .           |
+|    . o . .     .|
+|     o B * o   +E|
+|      = S B    .*|
+|     . * + .   +B|
+|      = +    o =@|
+|      .= o. . =o*|
+|      .o+.oo  .++|
++----[SHA256]-----+
+
+sed -i s/root/ansible/g /home/ansible/.ssh/id_rsa.pub
+
+chmod 600 /home/ansible/.ssh/id_rsa
+
+cp /home/ansible/.ssh/id_rsa.pub /home/ansible/.ssh/authorized_keys
+
+chmod 640 /home/ansible/.ssh/authorized_keys
+
+ssh-keyscan 192.168.5.212 192.168.122.1  >> /home/ansible/.ssh/known_hosts
+ssh-keyscan wildfly2 >> /home/ansible/.ssh/known_hosts
+
+chown -R ansible:ansible /home/ansible/.ssh
+
+cat /home/brians/id_rsa.pub >> /home/ansible/.ssh/authorized_keys
+
+rm -f /home/brians/id_rsa.pub
+
+rm -f /home/brians/ansible-setup.sh

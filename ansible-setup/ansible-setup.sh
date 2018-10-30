@@ -551,7 +551,7 @@ func_menu_selection_2(){
 	# 6) test that the user ansible can ssh into all nodes (master and slaves)
 	func_test_ansible_ssh
 	# expect needed for ssh testing, so remove last
-	func_remove_expect
+	# func_remove_expect
 }
 #===================================================================================================================
 func_run_on_slaves(){
