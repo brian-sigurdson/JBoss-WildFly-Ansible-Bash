@@ -132,9 +132,14 @@ func_ansible_setup(){
 
     mkdir $ANSIBLE_LOCAL_HOSTS_DIR
     mkdir $ANSIBLE_HOME/local_config
+    mkdir $ANSIBLE_HOME/local_playbooks
+    mkdir $ANSIBLE_HOME/local_scripts
 
     cp $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_hosts/* $ANSIBLE_LOCAL_HOSTS_DIR
     cp $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_config/* $ANSIBLE_HOME/local_config/
+    cp $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_playbooks/* $ANSIBLE_HOME/local_playbooks/
+    cp $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_scripts/* $ANSIBLE_HOME/local_scripts/
+
     ln -s $ANSIBLE_HOME/local_config/ansible.cfg $ANSIBLE_HOME/ansible.cfg
     
     # set the ansible hosts file, for the software to know what nodes we'll manage
