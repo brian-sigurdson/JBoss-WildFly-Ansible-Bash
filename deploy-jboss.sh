@@ -118,14 +118,14 @@ LOG_FILES_PATH=$PATH_TO_LOG_FILES_DIR
 echo "`date`" > /tmp/1-ansible-setup-begin.txt
 
 # start ansible setup script with parameters
-$PATH_TO_ANSIBLE_SETUP_FILE 
-    $ANSIBLE_UN 
-    $ANSIBLE_PWD 
-    $PROG_USER_SELECTION
-    $PROG_USER_PWD 
-    $PATH_TO_SLAVES_FILE 
-    $SHOW_EXPECT_SCRIPT_MSG 
-    $LOG_FILES_PATH
+$PATH_TO_ANSIBLE_SETUP_FILE \
+    $ANSIBLE_UN \
+    $ANSIBLE_PWD \
+    $PROG_USER_SELECTION \
+    $PROG_USER_PWD \
+    $PATH_TO_SLAVES_FILE \
+    $SHOW_EXPECT_SCRIPT_MSG \
+    $LOG_FILES_PATH \
     $PATH_TO_ANSIBLE_SETUP_FILES_DIR | tee -a /tmp/ansible-setup1.log
 
 # 3=setup slaves

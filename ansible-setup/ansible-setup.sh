@@ -68,19 +68,19 @@ func_print_script_info(){
 
 	echo ""
 	echo "###############################################"
-	echo "Script name:				$PROG_BASE_NAME"
-	echo "Script user:				$PROG_USER"
-	echo "Running as:				$USER"
-	echo "Running on:				`hostname -f`"
-	echo "IP-Address:				$HOST_IP"
-	echo "ANSIBLE_UN:				$ANSIBLE_UN"
-	#echo "ANSIBLE_PWD:				$ANSIBLE_PWD"
-	echo "PROG_USER_SELECTION:		$PROG_USER_SELECTION"
-	#echo "PROG_USER_PWD:			$PROG_USER_PWD"
-	echo "SLAVE_FILE:				$SLAVE_FILE"
-	echo "SHOW_EXPECT_SCRIPT_MSG:	$SHOW_EXPECT_SCRIPT_MSG"
-	echo "LOG_FILES_PATH: 			$LOG_FILES_PATH"
-	echo "SLAVE_FILE:				$SLAVE_FILE"
+	echo "Script name:              $PROG_BASE_NAME"
+	echo "Script user:              $PROG_USER"
+	echo "Running as:               $USER"
+	echo "Running on:               `hostname -f`"
+	echo "IP-Address:               $HOST_IP"
+	echo "ANSIBLE_UN:               $ANSIBLE_UN"
+	#echo "ANSIBLE_PWD:             $ANSIBLE_PWD"
+	echo "PROG_USER_SELECTION:      $PROG_USER_SELECTION"
+	#echo "PROG_USER_PWD:           $PROG_USER_PWD"
+	echo "SLAVE_FILE:               $SLAVE_FILE"
+	echo "SHOW_EXPECT_SCRIPT_MSG:   $SHOW_EXPECT_SCRIPT_MSG"
+	echo "LOG_FILES_PATH:           $LOG_FILES_PATH"
+	echo "SLAVE_FILE:               $SLAVE_FILE"
 	echo "###############################################"
 	echo ""
 }
@@ -512,10 +512,10 @@ func_test_ansible_ssh(){
 	cd $PATH_TO_ANSIBLE_SETUP_FILES_DIR
 
 	# process the master
-	su -c './test-ansible-ssh.sh ansible 0' $ANSIBLE_UN
+	su -c './test-ansible-ssh.sh ansible' 0 $ANSIBLE_UN $LOG_FILES_PATH
 
 	# process slaves
-	su -c './test-ansible-ssh.sh ansible 1' $ANSIBLE_UN
+	su -c './test-ansible-ssh.sh ansible' 1 $ANSIBLE_UN $LOG_FILES_PATH
 
 	# make sure all of the ssh log files are owned by $PROG_USER
 	chown -R $PROG_USER.$PROG_USER `pwd`/$LOG_FILES_PATH
