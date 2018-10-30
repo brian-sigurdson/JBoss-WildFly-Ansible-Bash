@@ -74,6 +74,18 @@ func_test_password_file(){
 }
 
 #########################################################################################################
+# firewall setup
+#########################################################################################################
+
+func_firewall_setup(){
+    # make sure we can ssh
+    systemctl enable firewalld;
+    systemctl start firewalld;
+    firewall-cmd --permanent --add-service=ssh/tcp
+    firewall-cmd --permanent --add-service=http/tcp
+}
+
+#########################################################################################################
 # ansible setup
 #########################################################################################################
 # This script will install the necessary software on this (master) node, and managed (slave) nodes.
@@ -113,15 +125,15 @@ func_ansible_setup(){
     echo "`date`" > /tmp/1-ansible-setup-begin.txt
 
     # start ansible setup script with parameters
-    $PATH_TO_ANSIBLE_SETUP_FILE \
-        $ANSIBLE_UN \
-        $ANSIBLE_PWD \
-        $PROG_USER_SELECTION \
-        $PROG_USER_PWD \
-        $PATH_TO_SLAVES_FILE \
-        $SHOW_EXPECT_SCRIPT_MSG \
-        $LOG_FILES_PATH \
-        $PATH_TO_ANSIBLE_SETUP_FILES_DIR | tee -a /tmp/ansible-setup1.log
+    # $PATH_TO_ANSIBLE_SETUP_FILE \
+    #     $ANSIBLE_UN \
+    #     $ANSIBLE_PWD \
+    #     $PROG_USER_SELECTION \
+    #     $PROG_USER_PWD \
+    #     $PATH_TO_SLAVES_FILE \
+    #     $SHOW_EXPECT_SCRIPT_MSG \
+    #     $LOG_FILES_PATH \
+    #     $PATH_TO_ANSIBLE_SETUP_FILES_DIR | tee -a /tmp/ansible-setup1.log
 
     echo "`date`" > /tmp/1-ansible-setup-end.txt
 
@@ -130,15 +142,9 @@ func_ansible_setup(){
     ANSIBLE_LOCAL_HOSTS_DIR=$ANSIBLE_HOME/local_hosts
     ANSIBLE_LOCAL_HOSTS_FILE=$ANSIBLE_LOCAL_HOSTS_DIR/hosts
 
-    mkdir $ANSIBLE_LOCAL_HOSTS_DIR
-    mkdir $ANSIBLE_HOME/local_config
-    mkdir $ANSIBLE_HOME/local_playbooks
-    mkdir $ANSIBLE_HOME/local_scripts
-
-    cp $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_hosts/* $ANSIBLE_LOCAL_HOSTS_DIR
-    cp $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_config/* $ANSIBLE_HOME/local_config/
-    cp $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_playbooks/* $ANSIBLE_HOME/local_playbooks/
-    cp $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_scripts/* $ANSIBLE_HOME/local_scripts/
+    cp -r $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_hosts/ $ANSIBLE_LOCAL_HOSTS_DIR
+    cp -r $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_config/ $ANSIBLE_HOME/local_config/
+    cp -r $PATH_TO_ANSIBLE_SETUP_FILES_DIR/jboss_wildfly_playbooks/ $ANSIBLE_HOME/jboss_wildfly_playbooks/
 
     ln -s $ANSIBLE_HOME/local_config/ansible.cfg $ANSIBLE_HOME/ansible.cfg
     
@@ -152,15 +158,12 @@ func_ansible_setup(){
     echo `cat $PATH_TO_SLAVES_FILE` >> $ANSIBLE_LOCAL_HOSTS_FILE
     echo "" >> $ANSIBLE_LOCAL_HOSTS_FILE
 
-    chown -R $ANSIBLE_UN.$ANSIBLE_PWD $ANSIBLE_HOME
+    chown -R $ANSIBLE_UN.$ANSIBLE_UN $ANSIBLE_HOME
 }
 
 #########################################################################################################
 
 echo "`date`" > /tmp/2-jboss-wildfly-setup-begin.txt
-
-# before we start using ansible, be sure it owns everything in is home dir
-chown -R $ANSIBLE_UN.$ANSIBLE_PWD $ANSIBLE_HOME
 
 # su - ansible -c "$PATH_TO_CL_ANSIBLE/hadoop-setup.sh $HADOOP_VERSION $MASTER_NAME $SLAVE_NAME_PREFIX $PATH_TO_ANSIBLE_DIR $NUM_SLAVES"
 
@@ -189,6 +192,7 @@ echo "`date`" > /tmp/2-jboss-wildfly-setup-end.txt
 #########################################################################################################
 # execute functions
 #########################################################################################################
+# func_firewall_setup
 # func_test_slaves_ip_address
 # func_test_password_file
-# func_ansible_setup
+func_ansible_setup
