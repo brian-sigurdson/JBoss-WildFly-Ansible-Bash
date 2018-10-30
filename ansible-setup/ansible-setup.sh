@@ -72,7 +72,6 @@ func_print_script_info(){
 	echo "Running as:	$USER"
 	echo "Running on:	`hostname -f`"
 	echo "IP-Address:	$HOST_IP"
-	echo "Num Slaves:	$NUM_SLAVES"
 	echo "Slave File:	$SLAVE_FILE"
 	echo "###############################################"
 	echo ""
@@ -92,7 +91,7 @@ func_install_other_software(){
 
 	# open-jdk, ant, ansible (use ansible's repo if desired)
 
-	for val in java ant; do
+	for val in java ant python; do
 		echo ""
 		echo "yum install -y " $val
 		echo ""
@@ -217,14 +216,6 @@ func_create_set_ssh_keys_localhost(){
 	echo ""
 	echo "chown -R $ANSIBLE_UN:$ANSIBLE_UN $SSH_DIR"
 	chown -R $ANSIBLE_UN:$ANSIBLE_UN $SSH_DIR
-}
-#===================================================================================================================
-func_install_python(){
-
-	echo ""
-	echo "yum install -y python"
-	echo ""
-	yum install -y python
 }
 #===================================================================================================================
 func_get_master_rsa_pub(){
@@ -534,7 +525,7 @@ func_menu_selection_2(){
 
 	# 1) print info & get password
 	func_print_script_info
-	func_get_user_passwd
+	#func_get_user_passwd
 
 	# 2) prepare master for slave update
 	func_install_sshpass
@@ -564,7 +555,6 @@ func_run_on_slaves(){
 	func_print_script_info
 	func_update_system
 	func_install_other_software
-	func_install_python
 	func_create_ansible_user
 	func_set_ansible_sudoer_privileges
 	func_create_set_ssh_keys_localhost
