@@ -381,15 +381,15 @@ func_retrieve_slave_log_file(){
 
 	local IP=$1
 	echo ""
-	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no PROG_USER@$IP:~/$IP.log `pwd`/$LOG_FILES_PATH"
-	sshpass -p $PROG_USER_PWD scp -o StrictHostKeyChecking=no $PROG_USER@$IP:~/$IP.log `pwd`/$LOG_FILES_PATH
+	echo "sshpass -p PROG_USER_PWD scp -o StrictHostKeyChecking=no $PROG_USER@$IP:~/$IP.log $LOG_FILES_PATH"
+	sshpass -p $PROG_USER_PWD scp -o StrictHostKeyChecking=no $PROG_USER@$IP:~/$IP.log $LOG_FILES_PATH
 }
 #===================================================================================================================
 func_remove_slave_log_file(){
 
 	local IP=$1
 	echo ""
-	echo "sshpass -p PROG_USER_PWD ssh -o StrictHostKeyChecking=no PROG_USER@$IP rm -f $IP.log"
+	echo "sshpass -p PROG_USER_PWD ssh -o StrictHostKeyChecking=no $PROG_USER@$IP rm -f $IP.log"
 	sshpass -p $PROG_USER_PWD ssh -o StrictHostKeyChecking=no $PROG_USER@$IP "rm -f $IP.log"
 }
 
@@ -469,10 +469,10 @@ func_setup_slaves(){
 
 	# process nodes
 	echo ""
-	echo "Processing file: $SLAVE_FILE"
+	# echo "Processing file: $SLAVE_FILE"
 	for NODE in `cat $SLAVE_FILE`; do
 		echo ""
-		echo "Processing: $NODE"
+		echo "Processing Node: $NODE"
 	# I was going to try and run the functions in the background to parallelize the process, but it seems to
 	# to be creating issues with the expect script.
 	#	func_setup_slaves_detail $NODE &
@@ -491,7 +491,7 @@ func_setup_slaves_detail(){
 	func_retrieve_slave_log_file $NODE
 	func_remove_slave_log_file $NODE
 	echo ""
-	echo "$NODE process complete"
+	echo "Process complete for node: $NODE"
 	echo ""
 	
 }
@@ -506,6 +506,7 @@ func_test_ansible_ssh(){
 
 	echo ""
 	echo "** Testing passwordless ssh for user $ANSIBLE_UN **"
+	echo ""
 
 	# change into the directory that contains the ansible scripts
 	# su -c below doesn't process variables, as single quotes are required, so you need to be in the dir first
