@@ -17,7 +17,7 @@
   gather_facts: no
 
   vars_files:
-    - ../local_variable_files/jboss-wildfly-vars.yml
+    - ../local_variable_files/local-vars.yml
 
 ########################################################################################
 # start tasks
