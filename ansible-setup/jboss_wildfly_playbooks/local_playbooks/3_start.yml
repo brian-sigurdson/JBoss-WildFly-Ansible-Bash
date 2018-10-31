@@ -3,18 +3,21 @@
 # Date:         2018-10-31
 # Description:  Start WildFly
 
+# The following page was very helpful in competing this task.
+# https://community.i2b2.org/wiki/display/getstarted/2.4.2.3+Run+Wildfly+as+a+Linux+Service
+
 ########################################################################################
 # start playbook
 ########################################################################################
 
-- name: Start WildFly {{ jboss_wildfly_verision }}
+- name: Start WildFly {{ jboss_wildfly_verision }} for {{ ansible_default_ipv4.address }}
   hosts: slaves
   remote_user: ansible
   become_user: root
   become: true
   become_method: sudo 
   connection: ssh
-  gather_facts: no
+  gather_facts: true
 
   vars_files:
     - ../local_variable_files/local-vars.yml
@@ -24,12 +27,32 @@
 ########################################################################################
 
   tasks:
-  - debug:
-    msg: "System ip address {{ ansible_default_ipv4.address }}"
+  - name: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly.conf /etc/default/wildfly.conf"
+    shell: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly.conf /etc/default/wildfly.conf"
 
-    ./standalone.sh -Djboss.bind.address=192.168.5.212
+  - name: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly-init-redhat.sh"
+    shell: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly-init-redhat.sh"
 
-    
+  # - debug:
+  #   msg: "System ip address {{ ansible_default_ipv4.address }}"
+
+  # - debug: var=ansible_all_ipv4_addresses
+  # - debug: var=ansible_default_ipv4.address
+
+  # - set_fact: local_ip_addr="{{ ansible_default_ipv4.address }}"
+
+  # - debug: 
+  #     msg: "the variable ansible_default_ipv4.address = {{ ansible_default_ipv4.address }}"
+
+  # - debug: 
+  #     msg: "the variable var = {{ local_ip_addr }}"
+
+  # - name: "{{ jboss_wildfly_install }}/bin/standalone.sh -Djboss.bind.address={{ ansible_default_ipv4.address }} &"
+  #   shell: "{{ jboss_wildfly_install }}/bin/standalone.sh -Djboss.bind.address={{ ansible_default_ipv4.address }} &"
+  #   become: yes
+  #   become_user: "{{ jboss_wildfly_user_name }}"
+
+
 
 # delete temp files that tend to accumulate in the user ansible's home dir
 # place at the bottom of all playbooks
