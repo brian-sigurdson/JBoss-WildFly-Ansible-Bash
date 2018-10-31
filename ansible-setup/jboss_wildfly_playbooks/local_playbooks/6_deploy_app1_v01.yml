@@ -1,0 +1,42 @@
+---
+# Author:       Brian Sigurdson sigurdson.brian@gmail.com
+# Date:         2018-10-31
+# Description:  Deploy app1_v01.war on master to all slaves.
+
+# The following page was very helpful in competing this task.
+# https://docs.jboss.org/author/display/WFLY/Command+Line+Interface
+
+########################################################################################
+# start playbook
+########################################################################################
+
+- name: Deploy app1_v01.war
+  hosts: slaves
+  remote_user: ansible
+  become_user: root
+  become: true
+  become_method: sudo 
+  connection: ssh
+  gather_facts: false
+  vars:
+    app_name: app1-v01.war
+
+  vars_files:
+    - ../local_variable_files/local-vars.yml
+
+########################################################################################
+# start tasks
+########################################################################################
+
+  tasks:
+  - name: Copy {{ app_name }} to {{ jboss_wildfly_install }}/standalone/deployments/
+    copy:
+      src: "{{ jboss_wildfly_deployments_dir }}/{{ app_name }}"
+      dest: "{{ jboss_wildfly_install }}/standalone/deployments/{{ app_name }}"
+      owner: "{{ jboss_wildfly_user_name }}"
+      group: "{{ jboss_wildfly_user_group }}"
+      mode: 0644
+
+  # delete temp files that tend to accumulate in the user ansible's home dir
+  # place at the bottom of all playbooks
+  - include: ../../local_includes/delete-ansible-tmp-files.yml
