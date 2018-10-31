@@ -142,9 +142,10 @@ func_ansible_setup(){
     ANSIBLE_LOCAL_HOSTS_DIR=$ANSIBLE_HOME/local_hosts
     ANSIBLE_LOCAL_HOSTS_FILE=$ANSIBLE_LOCAL_HOSTS_DIR/hosts
 
-    cp -r $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_hosts/ $ANSIBLE_LOCAL_HOSTS_DIR
-    cp -r $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_config/ $ANSIBLE_HOME/local_config/
     cp -r $PATH_TO_ANSIBLE_SETUP_FILES_DIR/jboss_wildfly_playbooks/ $ANSIBLE_HOME/jboss_wildfly_playbooks/
+    cp -r $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_config/ $ANSIBLE_HOME/local_config/
+    cp -r $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_hosts/ $ANSIBLE_LOCAL_HOSTS_DIR
+    cp -r $PATH_TO_ANSIBLE_SETUP_FILES_DIR/local_includes/ $ANSIBLE_HOME/local_includes    
 
     ln -s $ANSIBLE_HOME/local_config/ansible.cfg $ANSIBLE_HOME/ansible.cfg
     

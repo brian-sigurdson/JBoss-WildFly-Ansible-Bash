@@ -1,0 +1,36 @@
+---
+# Author:       Brian Sigurdson sigurdson.brian@gmail.com
+# Date:         2018-10-31
+# Description:  Start WildFly
+
+########################################################################################
+# start playbook
+########################################################################################
+
+- name: Start WildFly {{ jboss_wildfly_verision }}
+  hosts: slaves
+  remote_user: ansible
+  become_user: root
+  become: true
+  become_method: sudo 
+  connection: ssh
+  gather_facts: no
+
+  vars_files:
+    - ../local_variable_files/local-vars.yml
+
+########################################################################################
+# start tasks
+########################################################################################
+
+  tasks:
+  - debug:
+    msg: "System ip address {{ ansible_default_ipv4.address }}"
+
+    ./standalone.sh -Djboss.bind.address=192.168.5.212
+
+    
+
+# delete temp files that tend to accumulate in the user ansible's home dir
+# place at the bottom of all playbooks
+  - include: ../../local_includes/delete-ansible-tmp-files.yml
