@@ -18,6 +18,10 @@
   become_method: sudo 
   connection: ssh
   gather_facts: true
+  vars:
+    wildfly_conf_sym_file:  /etc/default/wildfly.conf
+    wildfly_init_sym_file:  /etc/init.d/wildfly
+    java_home:  /usr/lib/jvm/java
 
   vars_files:
     - ../local_variable_files/local-vars.yml
@@ -27,11 +31,34 @@
 ########################################################################################
 
   tasks:
-  - name: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly.conf /etc/default/wildfly.conf"
-    shell: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly.conf /etc/default/wildfly.conf"
+  - file:
+      src: "{{ jboss_wildfly_install }}/bin/init.d/wildfly.conf"
+      dest: "{{ wildfly_conf_sym_file }}"
+      owner: "{{ jboss_wildfly_user_name }}"
+      group: "{{ jboss_wildfly_user_group }}"
+      state: link
 
-  - name: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly-init-redhat.sh"
-    shell: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly-init-redhat.sh"
+  - file:
+      src: "{{ jboss_wildfly_install }}/bin/init.d/wildfly-init-redhat.sh"
+      dest: "{{ wildfly_init_sym_file }}"
+      owner: "{{ jboss_wildfly_user_name }}"
+      group: "{{ jboss_wildfly_user_group }}"
+      state: link
+
+  - name: "echo JAVA_HOME={{ java_home }} >> {{ wildfly_conf_sym_file }}"
+    shell: "echo JAVA_HOME={{ java_home }} >> {{ wildfly_conf_sym_file }}"
+
+  - name: "echo JBOSS_HOME={{ jboss_wildfly_install }} >> {{ wildfly_conf_sym_file }}"
+    shell: "echo JBOSS_HOME={{ jboss_wildfly_install }} >> {{ wildfly_conf_sym_file }}"
+
+  - name: "echo JBOSS_USER={{ jboss_wildfly_user_name }} >> {{ wildfly_conf_sym_file }}"
+    shell: "echo JBOSS_USER={{ jboss_wildfly_user_name }} >> {{ wildfly_conf_sym_file }}"
+
+  - name: "echo JBOSS_MODE={{ jboss_wildfly_operating_mode }} >> {{ wildfly_conf_sym_file }}"
+    shell: "echo JBOSS_MODE={{ jboss_wildfly_operating_mode }} >> {{ wildfly_conf_sym_file }}"
+
+  # - name: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly"
+  #   shell: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly"
 
   # - debug:
   #   msg: "System ip address {{ ansible_default_ipv4.address }}"

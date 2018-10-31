@@ -23,6 +23,8 @@ jboss_wildfly_file_name: wildfly-{{ jboss_wildfly_version }}.tar.gz
 jboss_wildfly_compressed_dir: /opt/compressed
 jboss_wildfly_compressed_file_src: "{{ jboss_wildfly_compressed_dir }}/{{ jboss_wildfly_file_name }}/"
 
+jboss_wildfly_operating_mode: standalone
+
 
 
 
