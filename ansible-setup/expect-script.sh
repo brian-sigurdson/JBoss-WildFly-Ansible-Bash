@@ -1,9 +1,12 @@
 #!/usr/bin/expect -f
 
-# Purpose
-# This script allows a script running as sudo on the master to log into a user's account on a given node,
-# and execute the ansible-setup.sh script, in order to prepare the node for use with Ansible.
+# Author:       Brian Sigurdson sigurdson.brian@gmail.com
+# Date:         2018-10-30
+# Description:  This script allows a script running as sudo on the master to log into a user's account on a given node,
+# 				and execute the ansible-setup.sh script, in order to prepare the node for use with Ansible.
 
+####################################################################################################################
+# Notes from Expect:
 # Expect scripts generally spawn shells and then interact with them according to your script.
 # From http://www.tcl.tk/man/expect5.31/
 # -- Expect is a Tcl extension that lets you automate interactions with interactive programs such as Telnet and FTP clients. 

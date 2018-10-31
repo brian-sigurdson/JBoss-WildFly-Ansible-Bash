@@ -1,9 +1,10 @@
 #!/usr/bin/expect -f
 
-# Purpose
-# The purpose of this script is to test for a passwordless login on a remote host.
+# Author:       Brian Sigurdson sigurdson.brian@gmail.com
+# Date:         2018-10-30
+# Description:  The purpose of this script is to test for a passwordless login on a remote host.
 
-
+####################################################################################################################
 #====================================================================================
 # Comments from autoexpect:
 #

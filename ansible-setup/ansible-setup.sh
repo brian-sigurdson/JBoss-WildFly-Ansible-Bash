@@ -1,45 +1,10 @@
 #!/bin/bash
 
-# Assumptions:
-# 1)  The script is run with sudo privileges on the master node
-# 2)  When prompted, the user supplies their password for the slaves, so that the script may proceed without 
-#     user intervention.
-# 3)  It is assumed that the user password for all slaves is the same.
-# 4)  It is assumed that the user does not already have passwordless login to the nodes in the cluster.
-#     Presently, the file assumes the remote system will prompt the expect.sh code for the program
-#     ** user's password.
-#     ** Worse case scenario, this script can be executed on the slave manually with the following paramaters:
-#	 ANSIBLE_UN="$1" 		= ansible
-#	 ANSIBLE_PWD="$2"		= ansible
-#	 PROG_USER_SELECTION="$3"	= 3 (must be the number three on the slave)
-#	 SLAVE_FILE="$4"		= slaves.txt
-# 5)  The user selects menu item 1 (master) before selecting item 2 (slaves)
-
-# This script will do the following:
-# Provide a menu to allow the user to select between updating the master and slave nodes.
-
-# Master Node
-# 1) yum update, upgrade, autoremove
-# 2) create the user ansible
-# 3) give user ansible sudo privileges without password prompt
-# 4) generate ssh key for ansible and update its known_host file so that ansible can ssh into localhost
-#    without password prompt
-# 5) use sshpass and scp to send a copy of this script to each slave along with a copy of the master node's public ssh key
-# 6) execute the script with sudo on each slave, using the user's password
-
-# Managed Nodes (slaves)
-# 1) update, upgrade, autoremove, install python
-# 2) create the user ansible
-# 3) give user ansible sudo privileges without password prompt
-# 4) generate ssh key for ansible and update its known_host file so that ansible can ssh into localhost
-#    without password prompt
-# 5) copy the master public key into ansible's authorized_keys file so that ansible@master can ssh ansible@slave
-#    without password prompt
-
-# NOTE: all of the slaves' ssh keys will be copied to /home/ansible/.ssh/known_hosts on the master node, 
-# 	using ssh-keyscan slaves.txt, from the master node, so that the master node will recognized
-# 	the slave nodes when the user ansible tries to ssh into the slave nodes to execute Ansible playbooks.
-#       This is done after all the slaves have been updated, although it could probably be run at anytime.
+# Author:       Brian Sigurdson sigurdson.brian@gmail.com
+# Date:         2018-10-30
+# Description:  This script prepares the master and slave nodes to be used with, and managed by, Ansible.
+#				It will install all the necessary software on each node and create a user with sudoer
+#				privileges to be used by Ansible.				
 
 ####################################################################################################################
 # globals

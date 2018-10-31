@@ -1,8 +1,11 @@
 #!/bin/bash
 
-# Purpose
-# Test that passwordless ssh exists for user ansible from the master to each
-# node in the cluster, in cluding the master node itself
+# Author:       Brian Sigurdson sigurdson.brian@gmail.com
+# Date:         2018-10-30
+# Description:  Test that passwordless ssh exists for user ansible from the master to each
+# 				node in the cluster, in cluding the master node itself.
+
+####################################################################################################################
 
 #PROG_NAME="$0"
 #PROG_BASE_NAME=$(basename $0)
