@@ -1,0 +1,192 @@
+---
+# This playbook creates a jboss/wildfly user if it does not exist
+
+
+########################################################################################
+# start playbook
+########################################################################################
+
+- name: Create a {{ jboss_wildfly_user_name }} user if one does not exist.
+  hosts: slaves
+  remote_user: ansible
+  become_user: root
+  become: true
+  become_method: sudo 
+  connection: ssh
+  gather_facts: no
+
+  vars_files:
+    - ../local_variable_files/jboss-wildfly-vars.yml
+
+
+########################################################################################
+# start tasks
+########################################################################################
+
+  tasks:
+  - name: Gather facts about "{{ jboss_wildfly_install }}" and exit if "{{ jboss_wildfly_install }}" already exits
+    stat:
+      path: "{{ jboss_wildfly_install }}"
+    register: p
+
+  - fail:
+      msg: "{{ jboss_wildfly_install }} Already exists.  Run the delete script to remove WildFly {{ jboss_wildfly_version }}, then rerun the deploy scipt."
+    when: p.stat.isdir is defined and p.stat.isdir
+
+  - name: Test for user {{ jboss_wildfly_user_name }} and create if not present
+    getent:
+      database: passwd
+      key: "{{ jboss_wildfly_user_name }}"
+      split: ':'
+      fail_key: False
+
+#  - debug: var=getent_passwd
+
+  - debug:
+      msg: "{{ jboss_wildfly_user_name }} is not present.  Create user {{ jboss_wildfly_user_name }} and group {{ jboss_wildfly_user_group }}"
+    when: getent_passwd[ "{{ jboss_wildfly_user_name }}" ][4] is not defined
+
+  - debug:
+      msg: "{{ jboss_wildfly_user_name }} is already present."
+    when: getent_passwd[ "{{ jboss_wildfly_user_name }}" ][4] is defined
+
+  - name: Create group {{ jboss_wildfly_user_name }} if group {{ jboss_wildfly_user_name }} not present.  
+    group:
+      name: "{{ jboss_wildfly_user_name }}"
+      state: present
+    when: getent_passwd[ "{{ jboss_wildfly_user_name }}" ][4] is not defined
+    become_user: root
+    become: true
+    become_method: sudo 
+
+  - name: Create user {{ jboss_wildfly_user_name }} if not present
+    user:
+      name: "{{ jboss_wildfly_user_name }}"
+      group: "{{ jboss_wildfly_user_name }}"
+      password: "{{ jboss_wildfly_user_pwd | password_hash('sha512') }}"
+      comment: User to run {{ jboss_wildfly_version }}
+      shell: /bin/bash
+      home: "{{ jboss_wildfly_user_home }}"
+      update_password: on_create
+    when: getent_passwd[ "{{ jboss_wildfly_user_name }}" ][4] is not defined
+    become_user: root
+    become: true
+    become_method: sudo 
+
+  - name: create {{ jboss_wildfly_base }}, if it does not exist
+    file:
+      path: "{{ jboss_wildfly_base }}"
+      state: directory
+      mode: 0755
+      owner: "{{ jboss_wildfly_user_name }}"
+      group: "{{ jboss_wildfly_user_group }}"
+      recurse: yes
+
+  - name: Extract {{ jboss_wildfly_compressed }}/{{ jboss_wildfly_file }} into {{ jboss_wildfly_base }}
+    unarchive:
+      src: "{{ jboss_wildfly_compressed }}/{{ jboss_wildfly_file }}"
+      dest: "{{ jboss_wildfly_base }}"
+
+  - name: mv {{ jboss_wildfly_base }}/jboss_wildfly-{{ jboss_wildfly_version }} to {{ jboss_wildfly_install }}
+    command: mv {{ jboss_wildfly_base }}/jboss_wildfly-{{ jboss_wildfly_version }} {{ jboss_wildfly_install }}
+
+#  - name: Ensure {{ hadoop_base }} directories are 0755
+#    command: find {{ hadoop_base }} -type d -exec chmod 0755 {} \;
+
+#  - name: Ensure {{ hadoop_base }} files are 0644
+#    command: find {{ hadoop_base }} -type f -exec chmod 0644 {} \;
+
+#  - name: Ensure {{ hadoop_install }}/bin files are 0744
+#    command: find {{ hadoop_install }}/bin -type f -exec chmod 0744 {} \;
+
+#  - name: Ensure {{ hadoop_install }}/sbin files are 0744
+#    command: find {{ hadoop_install }}/sbin -type f -exec chmod 0744 {} \;
+
+  - name: Ensure {{ hadoop_user_name }} is owner of {{ hadoop_base }} and all contents
+    file:
+      path: "{{ hadoop_base }}"
+      owner: "{{ hadoop_user_name }}"
+      group: "{{ hadoop_user_group }}"
+      recurse: yes 
+
+  - name: Create {{ hadoop_conf_dir }}, if it does not exist
+    file:
+      path: "{{ hadoop_conf_dir }}"
+      state: directory
+      mode: 0755
+      owner: "{{ hadoop_user_name }}"
+      group: "{{ hadoop_user_group }}"
+      recurse: yes
+
+  - name: mv {{ hadoop_install }}/{{ hadoop_default_conf_dir }}/* to {{ hadoop_conf_dir }}
+    shell: mv {{ hadoop_install }}/{{ hadoop_default_conf_dir }}/* {{ hadoop_conf_dir }}
+
+  - name: Ensure directories are 0755
+    command: find {{ hadoop_install }}/{{ hadoop_default_conf_dir }} -type d -exec chmod 0755 {} \;
+
+  - name: Ensure files are 0644
+    command: find {{ hadoop_install }}/{{ hadoop_default_conf_dir }} -type f -exec chmod 0644 {} \;
+
+  - name: Ensure {{ hadoop_user_name }} is owner of {{ hadoop_conf_dir }} and all contents
+    file:
+      path: "{{ hadoop_conf_dir }}"
+      owner: "{{ hadoop_user_name }}"
+      group: "{{ hadoop_user_name }}"
+      recurse: yes 
+
+
+
+
+
+    get_url:
+      url: "{{ jboss_wildfly_url }}"
+      dest: "{{ hadoop_install }}/lib/"
+      owner: "{{ hadoop_user_name }}"
+      group: "{{ hadoop_user_group }}"
+      mode: 0644
+
+  - name: get md5 checksum value for protobuf file
+    command: cat "{{ hadoop_install }}/lib/{{ protobuf_java_250_md5_name }}"
+    register: checksum_md5
+
+#  - debug: var=checksum_md5
+#  - debug: var=checksum_md5.stdout
+
+  - name: "{{ protobuf_java_250_jar_url }}"
+    get_url:
+      url: "{{ protobuf_java_250_jar_url }}"
+      dest: "{{ hadoop_install }}/lib/"
+      checksum: md5:{{ checksum_md5.stdout }}
+      owner: "{{ hadoop_user_name }}"
+      group: "{{ hadoop_user_group }}"
+      mode: 0644
+
+  - name: Install libsnappy-dev
+    apt:
+      name: libsnappy-dev
+      update_cache: no
+      state: present
+
+  - name: Install libmysql-java
+    apt:
+      name: libmysql-java
+      update_cache: no
+      state: present
+
+  - name: cp /usr/lib/x86_64-linux-gnu/libsnappy.* {{ hadoop_install }}/lib/native/Linux-amd64-64
+    copy:
+      src: "{{ item }}"
+      dest: "{{ hadoop_install }}/lib/native/Linux-amd64-64"
+      owner: "{{ hadoop_user_name }}"
+      group: "{{ hadoop_user_group }}"
+      mode: 0644
+    with_fileglob:
+      - /usr/lib/x86_64-linux-gnu/libsnappy.*
+
+  - name: ln -s /usr/share/java/mysql-connector-java.jar {{ hadoop_install }}/lib/mysql-connector-java.jar
+    file:
+      src: /usr/share/java/mysql-connector-java.jar
+      dest: "{{ hadoop_install }}/lib/mysql-connector-java.jar"
+      state: link
+     
+  - include: ../../local_includes/delete-ansible-tmp-files.yml

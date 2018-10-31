@@ -1,19 +1,25 @@
 # Purpose:
 # This file contains variables needed to deploy jboss/wildfly
 
+jboss_wildfly_verision: 8.1.0
+jboss_wildfly_url: http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.tar.gz
+
+jboss_wildfly_base: /opt/jboss_wildfly
+jboss_wildfly_install: "{{ jboss_wildfly_base }}/{{ jboss_wildfly_version }}"
+
+jboss_wildfly_user_name:  wildfly
+jboss_wildfly_user_group: "{{ jboss_wildfly_user_name }}"
+jboss_wildfly_user_pwd:  "{{ jboss_wildfly_user_name }}"
+jboss_wildfly_user_home: /home/{{ jboss_wildfly_user_name }}
 
 
-hadoop_base: /opt/hadoop
-hadoop_install: "{{ hadoop_base }}/{{ hadoop_version }}"
+
 
 hadoop_file: hadoop-{{ hadoop_version }}-bin.tar.gz
 hadoop_file_checksum_mds: hadoop-{{ hadoop_version }}-bin.tar.gz.mds
 hadoop_compressed: /opt/compressed
 
-hadoop_user_name:  hadoop
-hadoop_user_group: "{{ hadoop_user_name }}"
-hadoop_user_pwd:  "{{ hadoop_user_name }}"
-hadoop_user_home: /home/{{ hadoop_user_name }}
+
 
 hadoop_conf_dir: "{{ hadoop_base }}/{{ hadoop_version }}_conf_in_use"
 hadoop_conf_master_dir: "{{ hadoop_base }}/{{ hadoop_version }}_conf_master"
