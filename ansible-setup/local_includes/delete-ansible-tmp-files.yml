@@ -1,0 +1,15 @@
+---
+# Author:       Brian Sigurdson sigurdson.brian@gmail.com
+# Date:         2018-10-31
+# Description:  To delete tmp files.
+
+# Ansible stores temporary information in /home/ansible/.ansible/tmp during playbook execution.
+# These files should be deleted upon completion, but often remain and eventually fill-up the partition.
+# 
+# Place an include at the bottom of every playbook to delete /home/ansible/.ansible/tmp/*.
+
+- name: Deleting /home/ansible/.ansible/tmp
+  file:
+    path: /home/ansible/.ansible/tmp
+    state: absent
+
