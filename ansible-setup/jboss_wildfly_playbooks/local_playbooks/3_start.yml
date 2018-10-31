@@ -57,29 +57,8 @@
   - name: "echo JBOSS_MODE={{ jboss_wildfly_operating_mode }} >> {{ wildfly_conf_sym_file }}"
     shell: "echo JBOSS_MODE={{ jboss_wildfly_operating_mode }} >> {{ wildfly_conf_sym_file }}"
 
-  # - name: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly"
-  #   shell: "ln -s {{ jboss_wildfly_install }}/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly"
-
-  # - debug:
-  #   msg: "System ip address {{ ansible_default_ipv4.address }}"
-
-  # - debug: var=ansible_all_ipv4_addresses
-  # - debug: var=ansible_default_ipv4.address
-
-  # - set_fact: local_ip_addr="{{ ansible_default_ipv4.address }}"
-
-  # - debug: 
-  #     msg: "the variable ansible_default_ipv4.address = {{ ansible_default_ipv4.address }}"
-
-  # - debug: 
-  #     msg: "the variable var = {{ local_ip_addr }}"
-
-  # - name: "{{ jboss_wildfly_install }}/bin/standalone.sh -Djboss.bind.address={{ ansible_default_ipv4.address }} &"
-  #   shell: "{{ jboss_wildfly_install }}/bin/standalone.sh -Djboss.bind.address={{ ansible_default_ipv4.address }} &"
-  #   become: yes
-  #   become_user: "{{ jboss_wildfly_user_name }}"
-
-
+  - name: "{{ wildfly_init_sym_file }} start"
+    shell: "{{ wildfly_init_sym_file }} start"
 
 # delete temp files that tend to accumulate in the user ansible's home dir
 # place at the bottom of all playbooks

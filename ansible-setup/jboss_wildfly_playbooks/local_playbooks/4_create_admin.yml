@@ -1,0 +1,43 @@
+---
+# Author:       Brian Sigurdson sigurdson.brian@gmail.com
+# Date:         2018-10-31
+# Description:  Create an admin user for WildFly
+
+# The following page was very helpful in competing this task.
+# https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/6.4/html/administration_and_configuration_guide/sect-add-user_script_command_line_examples
+
+########################################################################################
+# start playbook
+########################################################################################
+
+- name: Create WildFly {{ jboss_wildfly_verision }} admin user for {{ ansible_default_ipv4.address }}
+  hosts: slaves
+  remote_user: ansible
+  become_user: root
+  become: true
+  become_method: sudo 
+  connection: ssh
+  gather_facts: false
+
+  vars_files:
+    - ../local_variable_files/local-vars.yml
+
+########################################################################################
+# start tasks
+########################################################################################
+
+  tasks:
+  # do not user for now.
+  # there are too many problems adding users via shell at the moment.
+  # move on for now.
+
+  # - name: "{{ jboss_wildfly_install }}/bin/add-user.sh -u 'adminuser1' -p 'password1!' -g 'admin'"
+  #   shell: "{{ jboss_wildfly_install }}/bin/add-user.sh -u 'adminuser1' -p 'password1!' -g 'admin'"
+
+  # - name: "{{ jboss_wildfly_install }}/bin/add-user.sh -u 'adminuser98' -p 'password1!' -g 'admin'"
+  #   command: "{{ jboss_wildfly_install }}/bin/add-user.sh -u 'adminuser98' -p 'password1!' -g 'admin'"
+  #   register: result
+
+# delete temp files that tend to accumulate in the user ansible's home dir
+# place at the bottom of all playbooks
+  - include: ../../local_includes/delete-ansible-tmp-files.yml
