@@ -99,7 +99,7 @@ func_install_other_software(){
 
 	# open-jdk, ant, ansible (use ansible's repo if desired)
 
-	for val in java ant python; do
+	for val in java ant maven python; do
 		echo ""
 		echo "yum install -y " $val
 		echo ""
