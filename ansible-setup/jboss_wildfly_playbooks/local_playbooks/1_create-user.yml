@@ -63,3 +63,7 @@
     become_user: root
     become: true
     become_method: sudo 
+
+# delete temp files that tend to accumulate in the user ansible's home dir
+# place at the bottom of all playbooks
+  - include: ../../local_includes/delete-ansible-tmp-files.yml
