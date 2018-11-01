@@ -27,16 +27,16 @@
 ########################################################################################
 
   tasks:
-  - name: create {{ jboss_wildfly_compressed_dir }}, if it does not exist
-    file:
-      path: "{{ jboss_wildfly_compressed_dir }}"
-      state: directory
-      mode: 0755
-      recurse: yes
+  # - name: create {{ jboss_wildfly_compressed_dir }}, if it does not exist
+  #   file:
+  #     path: "{{ jboss_wildfly_compressed_dir }}"
+  #     state: directory
+  #     mode: 0755
+  #     recurse: yes
     
-  - name: Test if "{{ jboss_wildfly_compressed_dir }}/{{ jboss_wildfly_app_name }}" already exists.
+  - name: Test if "{{ jboss_wildfly_install }}/standalone/deployments/{{ jboss_wildfly_app_name }}" already exists.
     stat:
-      path: "{{ jboss_wildfly_compressed_dir }}/{{ jboss_wildfly_app_name }}"
+      path: "{{ jboss_wildfly_install }}/standalone/deployments/{{ jboss_wildfly_app_name }}"
     register: hd_file
 
   # - name: Download {{ jboss_wildfly_app_name }} into {{ jboss_wildfly_compressed_dir }}, when {{ jboss_wildfly_app_name }} does not exist.
@@ -47,7 +47,7 @@
 
   - name: Copy {{ jboss_wildfly_app_name }} to {{ jboss_wildfly_install }}/standalone/deployments/, when it does not exist
     copy:
-      src: "{{ jboss_wildfly_deployments_dir }}/{{ app_name }}"
+      src: "{{ jboss_wildfly_compressed_dir }}/{{ jboss_wildfly_app_name }}"
       dest: "{{ jboss_wildfly_install }}/standalone/deployments/{{ jboss_wildfly_app_name }}"
       owner: "{{ jboss_wildfly_user_name }}"
       group: "{{ jboss_wildfly_user_group }}"

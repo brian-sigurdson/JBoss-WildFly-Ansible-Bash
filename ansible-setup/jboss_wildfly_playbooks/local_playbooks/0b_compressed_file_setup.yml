@@ -39,8 +39,8 @@
 
   - name: Download {{ jboss_wildfly_app_name }} into {{ jboss_wildfly_compressed_dir }}, when {{ jboss_wildfly_app_name }} does not exist.
     get_url:
-      url:  "{{ jboss_wildfly_url }}"
-      dest: "{{ jboss_wildfly_compressed_dir }}/{{ jboss_wildfly_file_name }}"
+      url:  "{{ jboss_wildfly_app_url }}"
+      dest: "{{ jboss_wildfly_compressed_dir }}/{{ jboss_wildfly_app_name }}"
     when:  hd_file.stat.exists == False
 
 # delete temp files that tend to accumulate in the user ansible's home dir

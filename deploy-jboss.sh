@@ -99,6 +99,8 @@ func_firewall_setup(){
 
 # variable needed for the ansible setup scripts
 func_ansible_setup(){
+    echo "`date`" > /tmp/1-ansible-setup-begin.txt
+
     PATH_TO_LOG_FILES_DIR=$PATH_TO_ANSIBLE_SETUP_FILES_DIR/output
     MASTER_LOG_FILE_NAME=master-log.txt
     PATH_TO_MASTER_LOG_FILE=$PATH_TO_LOG_FILES_DIR/$MASTER_LOG_FILE_NAME
@@ -124,9 +126,7 @@ func_ansible_setup(){
     LOG_FILES_PATH=$PATH_TO_LOG_FILES_DIR
     # echo "log files path = " $LOG_FILES_PATH
     #8
-    # echo "PATH_TO_ANSIBLE_SETUP_FILES_DIR = " $PATH_TO_ANSIBLE_SETUP_FILES_DIR
-
-    echo "`date`" > /tmp/1-ansible-setup-begin.txt
+    # echo "PATH_TO_ANSIBLE_SETUP_FILES_DIR = " $PATH_TO_ANSIBLE_SETUP_FILES_DIR    
 
     # start ansible setup script with parameters
     $PATH_TO_ANSIBLE_SETUP_FILE \
@@ -137,9 +137,7 @@ func_ansible_setup(){
         $PATH_TO_SLAVES_FILE \
         $SHOW_EXPECT_SCRIPT_MSG \
         $LOG_FILES_PATH \
-        $PATH_TO_ANSIBLE_SETUP_FILES_DIR | tee -a /tmp/ansible-setup1.log
-
-    echo "`date`" > /tmp/1-ansible-setup-end.txt
+        $PATH_TO_ANSIBLE_SETUP_FILES_DIR | tee -a /tmp/ansible-setup1.log    
 
     # copy needed files and directories to ansible's home dir and set ownership
     ANSIBLE_LOCAL_HOSTS_DIR=$ANSIBLE_HOME/local_hosts
@@ -163,10 +161,12 @@ func_ansible_setup(){
     echo "" >> $ANSIBLE_LOCAL_HOSTS_FILE
 
     chown -R $ANSIBLE_UN.$ANSIBLE_UN $ANSIBLE_HOME
+
+    echo "`date`" > /tmp/1-ansible-setup-end.txt
 }
 
 #########################################################################################################
-func_ansible_setup(){
+func_wildfly_setup(){
     echo "`date`" > /tmp/2-jboss-wildfly-setup-begin.txt
 
     su - ansible -c "$PATH_TO_WILDFLY_SETUP_FILES_DIR/wildfly-setup.sh  $ANSIBLE_HOME" | tee -a /tmp/wildfly-setup.log
@@ -178,7 +178,12 @@ func_ansible_setup(){
 #########################################################################################################
 # execute functions
 #########################################################################################################
+echo "`date`" > /tmp/0-overall-setup-end.txt
+
 # func_firewall_setup
 # func_test_slaves_ip_address
 # func_test_password_file
 func_ansible_setup
+func_wildfly_setup
+
+echo "`date`" > /tmp/2-overall-setup-end.txt

@@ -19,7 +19,7 @@ jboss_wildfly_install: "{{ jboss_wildfly_base }}/{{ jboss_wildfly_version }}"
 jboss_wildfly_url: http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.tar.gz
 
 jboss_wildfly_app_name: app1-v01.war
-jboss_wildfly_app_url:  http://www.bks.name/downloads/{{ app_name }}
+jboss_wildfly_app_url:  http://www.bks.name/downloads/{{ jboss_wildfly_app_name }}
 
 # wildfly-8.1.0.Final.tar.gz
 jboss_wildfly_file_name: wildfly-{{ jboss_wildfly_version }}.tar.gz
@@ -34,72 +34,72 @@ jboss_wildfly_operating_mode: standalone
 
 
 
-# i may need this
-jboss_wildfly_env_file: "{{ jboss_wildfly_conf_dir }}/jboss_wildfly-env.sh"
-jboss_wildfly_env_vars_profile_d_file:  /etc/profile.d/jboss_wildfly-{{ jboss_wildfly_version }}-env.sh
+# # i may need this
+# jboss_wildfly_env_file: "{{ jboss_wildfly_conf_dir }}/jboss_wildfly-env.sh"
+# jboss_wildfly_env_vars_profile_d_file:  /etc/profile.d/jboss_wildfly-{{ jboss_wildfly_version }}-env.sh
 
 
 
-jboss_wildfly_conf_dir: "{{ jboss_wildfly_base }}/{{ jboss_wildfly_version }}_conf_in_use"
-jboss_wildfly_conf_master_dir: "{{ jboss_wildfly_base }}/{{ jboss_wildfly_version }}_conf_master"
-jboss_wildfly_default_conf_dir:  conf
-jboss_wildfly_data_base_dir: /data
+# jboss_wildfly_conf_dir: "{{ jboss_wildfly_base }}/{{ jboss_wildfly_version }}_conf_in_use"
+# jboss_wildfly_conf_master_dir: "{{ jboss_wildfly_base }}/{{ jboss_wildfly_version }}_conf_master"
+# jboss_wildfly_default_conf_dir:  conf
+# jboss_wildfly_data_base_dir: /data
 
 
-# these two directories only need to be on one drive, so they'll be coded to /data1, as it should always exist
-jboss_wildfly_jboss_wildfly_LOG_DIR: "{{ jboss_wildfly_data_base_dir }}1/{{ jboss_wildfly_version }}/logs"
-jboss_wildfly_jboss_wildfly_PID_DIR: "{{ jboss_wildfly_data_base_dir }}1/{{ jboss_wildfly_version }}/pids"
-mapred_system_dir: /data1/{{ jboss_wildfly_version }}/mapred/system
+# # these two directories only need to be on one drive, so they'll be coded to /data1, as it should always exist
+# jboss_wildfly_jboss_wildfly_LOG_DIR: "{{ jboss_wildfly_data_base_dir }}1/{{ jboss_wildfly_version }}/logs"
+# jboss_wildfly_jboss_wildfly_PID_DIR: "{{ jboss_wildfly_data_base_dir }}1/{{ jboss_wildfly_version }}/pids"
+# mapred_system_dir: /data1/{{ jboss_wildfly_version }}/mapred/system
 
-jboss_wildfly_name_node: "{{ jboss_wildfly_name_node }}"
-jboss_wildfly_secondary_name_node: "{{ jboss_wildfly_secondary_name_node }}"
-# eg. boa-
-jboss_wildfly_data_node_base_name: "{{ jboss_wildfly_data_node_base_name }}"
-jboss_wildfly_num_data_node: 15
-jboss_wildfly_num_drives_per_node: 2
+# jboss_wildfly_name_node: "{{ jboss_wildfly_name_node }}"
+# jboss_wildfly_secondary_name_node: "{{ jboss_wildfly_secondary_name_node }}"
+# # eg. boa-
+# jboss_wildfly_data_node_base_name: "{{ jboss_wildfly_data_node_base_name }}"
+# jboss_wildfly_num_data_node: 15
+# jboss_wildfly_num_drives_per_node: 2
 
-path: "{{ jboss_wildfly_install }}/bin:{{ jboss_wildfly_install }}/sbin:{{ java_home }}/bin:{{ java_home }}/bin"
+# path: "{{ jboss_wildfly_install }}/bin:{{ jboss_wildfly_install }}/sbin:{{ java_home }}/bin:{{ java_home }}/bin"
 
-# hard-code java_home to the symlink java-1.8.0-openjdk-adm46
-# to ensure the default-jdk doesn't inadvertenly update to java 9
-java_home: /usr/lib/jvm/java-1.8.0-openjdk-amd64
+# # hard-code java_home to the symlink java-1.8.0-openjdk-adm46
+# # to ensure the default-jdk doesn't inadvertenly update to java 9
+# java_home: /usr/lib/jvm/java-1.8.0-openjdk-amd64
 
-jboss_wildfly_dfs_name_dir: name
-jboss_wildfly_dfs_data_dir: hdfs-data
-jboss_wildfly_fs_checkpoint_dir: name-secondary
-jboss_wildfly_mapred_local_dir: "mapred/local"
-jboss_wildfly_mapred_system_dir: "mapred/system"
+# jboss_wildfly_dfs_name_dir: name
+# jboss_wildfly_dfs_data_dir: hdfs-data
+# jboss_wildfly_fs_checkpoint_dir: name-secondary
+# jboss_wildfly_mapred_local_dir: "mapred/local"
+# jboss_wildfly_mapred_system_dir: "mapred/system"
 
-# This dictionary will facilitate adding relevant export statements at the bottom of jboss_wildfly-env.sh
-# When using the with_dict attribute with the file module, the module will automatically iterate over 
-# all of the elements in the dictionary.
+# # This dictionary will facilitate adding relevant export statements at the bottom of jboss_wildfly-env.sh
+# # When using the with_dict attribute with the file module, the module will automatically iterate over 
+# # all of the elements in the dictionary.
 
-jboss_wildfly_env_list:
-# java home
-  - echo "" >> {{ jboss_wildfly_env_file }};
-  - echo \# Setting JAVA_HOME via Ansible playbook >> {{ jboss_wildfly_env_file }};
-  - echo export JAVA_HOME={{ java_home }} >> {{ jboss_wildfly_env_file }}
-# jboss_wildfly_INSTALL=/opt/jboss_wildfly/version
-  - echo "" >> {{ jboss_wildfly_env_file }};
-  - echo \# Setting jboss_wildfly_INSTALL via Ansible playbook >> {{ jboss_wildfly_env_file }};
-  - echo export jboss_wildfly_INSTALL={{ jboss_wildfly_install }} >> {{ jboss_wildfly_env_file }}
-# jboss_wildfly_CONF_DIR=/opt/jboss_wildfly/conf_version
-  - echo "" >> {{ jboss_wildfly_env_file }};
-  - echo \# Setting jboss_wildfly_CONF_DIR via Ansible playbook >> {{ jboss_wildfly_env_file }};
-  - echo export jboss_wildfly_CONF_DIR={{ jboss_wildfly_conf_dir }} >> {{ jboss_wildfly_env_file }}
-# jboss_wildfly_LOG_DIR=/data1/version/logs
-  - echo "" >> {{ jboss_wildfly_env_file }};
-  - echo \# Setting jboss_wildfly_LOG_DIR via Ansible playbook >> {{ jboss_wildfly_env_file }};
-  - echo export jboss_wildfly_LOG_DIR={{ jboss_wildfly_jboss_wildfly_LOG_DIR }} >> {{ jboss_wildfly_env_file }}
-# jboss_wildfly_PID_DIR=/data1/version/pids
-  - echo "" >> {{ jboss_wildfly_env_file }};
-  - echo \# Setting jboss_wildfly_PID_DIR via Ansible playbook >> {{ jboss_wildfly_env_file }};
-  - echo export jboss_wildfly_PID_DIR={{ jboss_wildfly_jboss_wildfly_PID_DIR }} >> {{ jboss_wildfly_env_file }}
+# jboss_wildfly_env_list:
+# # java home
+#   - echo "" >> {{ jboss_wildfly_env_file }};
+#   - echo \# Setting JAVA_HOME via Ansible playbook >> {{ jboss_wildfly_env_file }};
+#   - echo export JAVA_HOME={{ java_home }} >> {{ jboss_wildfly_env_file }}
+# # jboss_wildfly_INSTALL=/opt/jboss_wildfly/version
+#   - echo "" >> {{ jboss_wildfly_env_file }};
+#   - echo \# Setting jboss_wildfly_INSTALL via Ansible playbook >> {{ jboss_wildfly_env_file }};
+#   - echo export jboss_wildfly_INSTALL={{ jboss_wildfly_install }} >> {{ jboss_wildfly_env_file }}
+# # jboss_wildfly_CONF_DIR=/opt/jboss_wildfly/conf_version
+#   - echo "" >> {{ jboss_wildfly_env_file }};
+#   - echo \# Setting jboss_wildfly_CONF_DIR via Ansible playbook >> {{ jboss_wildfly_env_file }};
+#   - echo export jboss_wildfly_CONF_DIR={{ jboss_wildfly_conf_dir }} >> {{ jboss_wildfly_env_file }}
+# # jboss_wildfly_LOG_DIR=/data1/version/logs
+#   - echo "" >> {{ jboss_wildfly_env_file }};
+#   - echo \# Setting jboss_wildfly_LOG_DIR via Ansible playbook >> {{ jboss_wildfly_env_file }};
+#   - echo export jboss_wildfly_LOG_DIR={{ jboss_wildfly_jboss_wildfly_LOG_DIR }} >> {{ jboss_wildfly_env_file }}
+# # jboss_wildfly_PID_DIR=/data1/version/pids
+#   - echo "" >> {{ jboss_wildfly_env_file }};
+#   - echo \# Setting jboss_wildfly_PID_DIR via Ansible playbook >> {{ jboss_wildfly_env_file }};
+#   - echo export jboss_wildfly_PID_DIR={{ jboss_wildfly_jboss_wildfly_PID_DIR }} >> {{ jboss_wildfly_env_file }}
 
 
-protobuf_java_250_md5_name: protobuf-java-2.5.0.jar.md5
-protobuf_java_250_md5_path: http://central.maven.org/maven2/com/google/protobuf/protobuf-java/2.5.0/
-protobuf_java_250_md5_url: http://central.maven.org/maven2/com/google/protobuf/protobuf-java/2.5.0/{{ protobuf_java_250_md5_name }}
-protobuf_java_250_jar_url: http://central.maven.org/maven2/com/google/protobuf/protobuf-java/2.5.0/protobuf-java-2.5.0.jar
+# protobuf_java_250_md5_name: protobuf-java-2.5.0.jar.md5
+# protobuf_java_250_md5_path: http://central.maven.org/maven2/com/google/protobuf/protobuf-java/2.5.0/
+# protobuf_java_250_md5_url: http://central.maven.org/maven2/com/google/protobuf/protobuf-java/2.5.0/{{ protobuf_java_250_md5_name }}
+# protobuf_java_250_jar_url: http://central.maven.org/maven2/com/google/protobuf/protobuf-java/2.5.0/protobuf-java-2.5.0.jar
 
-ssh_port_head: 22
+# ssh_port_head: 22
