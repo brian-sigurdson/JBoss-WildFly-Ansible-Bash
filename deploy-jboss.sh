@@ -6,6 +6,12 @@
 #########################################################################################################
 # global varibles
 #########################################################################################################
+PATH_TO_WILDFLY_SETUP_FILES_DIR=`pwd`/wildfly-setup
+
+ANSIBLE_UN="ansible"
+ANSIBLE_PWD="ansible"
+ANSIBLE_HOME=/home/$ANSIBLE_UN
+
 PATH_TO_ANSIBLE_SETUP_FILES_DIR=`pwd`/ansible-setup
 ANSIBLE_SETUP_FILE_NAME=ansible-setup.sh
 PATH_TO_ANSIBLE_SETUP_FILE=$PATH_TO_ANSIBLE_SETUP_FILES_DIR/$ANSIBLE_SETUP_FILE_NAME
@@ -99,10 +105,8 @@ func_ansible_setup(){
 
     # parameters to ansible setup script
     #1
-    ANSIBLE_UN="ansible"
     # echo "ansible un = "$ANSIBLE_UN
     #2
-    ANSIBLE_PWD="ansible"
     # echo "ansible pwd = "$ANSIBLE_PWD
     #3
     # 1=setup master
@@ -125,20 +129,19 @@ func_ansible_setup(){
     echo "`date`" > /tmp/1-ansible-setup-begin.txt
 
     # start ansible setup script with parameters
-    # $PATH_TO_ANSIBLE_SETUP_FILE \
-    #     $ANSIBLE_UN \
-    #     $ANSIBLE_PWD \
-    #     $PROG_USER_SELECTION \
-    #     $PROG_USER_PWD \
-    #     $PATH_TO_SLAVES_FILE \
-    #     $SHOW_EXPECT_SCRIPT_MSG \
-    #     $LOG_FILES_PATH \
-    #     $PATH_TO_ANSIBLE_SETUP_FILES_DIR | tee -a /tmp/ansible-setup1.log
+    $PATH_TO_ANSIBLE_SETUP_FILE \
+        $ANSIBLE_UN \
+        $ANSIBLE_PWD \
+        $PROG_USER_SELECTION \
+        $PROG_USER_PWD \
+        $PATH_TO_SLAVES_FILE \
+        $SHOW_EXPECT_SCRIPT_MSG \
+        $LOG_FILES_PATH \
+        $PATH_TO_ANSIBLE_SETUP_FILES_DIR | tee -a /tmp/ansible-setup1.log
 
     echo "`date`" > /tmp/1-ansible-setup-end.txt
 
     # copy needed files and directories to ansible's home dir and set ownership
-    ANSIBLE_HOME=/home/$ANSIBLE_UN
     ANSIBLE_LOCAL_HOSTS_DIR=$ANSIBLE_HOME/local_hosts
     ANSIBLE_LOCAL_HOSTS_FILE=$ANSIBLE_LOCAL_HOSTS_DIR/hosts
 
@@ -163,31 +166,13 @@ func_ansible_setup(){
 }
 
 #########################################################################################################
+func_ansible_setup(){
+    echo "`date`" > /tmp/2-jboss-wildfly-setup-begin.txt
 
-echo "`date`" > /tmp/2-jboss-wildfly-setup-begin.txt
+    su - ansible -c "$PATH_TO_WILDFLY_SETUP_FILES_DIR/wildfly-setup.sh  $ANSIBLE_HOME" | tee -a /tmp/wildfly-setup.log
 
-# su - ansible -c "$PATH_TO_CL_ANSIBLE/hadoop-setup.sh $HADOOP_VERSION $MASTER_NAME $SLAVE_NAME_PREFIX $PATH_TO_ANSIBLE_DIR $NUM_SLAVES"
-
-echo "`date`" > /tmp/2-jboss-wildfly-setup-end.txt
-
-# ########################################################################################################
-
-# echo "`date`" > /tmp/3-boa-compiler-setup-begin.txt
-
-# # setup boa items
-# su - ansible -c "$PATH_TO_CL_ANSIBLE/boa-setup.sh $MASTER_NAME $PATH_TO_ANSIBLE_DIR"
-
-# echo "`date`" > /tmp/3-boa-compiler-setup-end.txt
-
-# #########################################################################################################
-
-# echo "`date`" > /tmp/4-drupal-setup-begin.txt
-
-# # ansible to install Drupal (LAMP)
-# su - ansible -c "$PATH_TO_CL_ANSIBLE/drupal-setup.sh $MASTER_NAME $PATH_TO_CL_ANSIBLE $PATH_TO_ANSIBLE_DIR"
-
-# echo "`date`" > /tmp/4-drupal-setup-end.txt
-
+    echo "`date`" > /tmp/2-jboss-wildfly-setup-end.txt
+}
 # #########################################################################################################
 
 #########################################################################################################

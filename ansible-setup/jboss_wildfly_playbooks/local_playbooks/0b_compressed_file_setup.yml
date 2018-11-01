@@ -1,0 +1,48 @@
+---
+# Author:       Brian Sigurdson sigurdson.brian@gmail.com
+# Date:         2018-10-31
+# Description:  Setup compressed file dir, and download app to deploy file if needed
+
+########################################################################################
+# start playbook
+########################################################################################
+
+- name: Compressed file setup for {{ jboss_wildfly_compressed_dir }}
+  hosts: master
+  remote_user: ansible
+  become_user: root
+  become: true
+  become_method: sudo 
+  connection: ssh
+  gather_facts: no
+
+  vars_files:
+    - ../local_variable_files/local-vars.yml
+
+
+########################################################################################
+# start tasks
+########################################################################################
+
+  tasks:
+  - name: create {{ jboss_wildfly_compressed_dir }}, if it does not exist
+    file:
+      path: "{{ jboss_wildfly_compressed_dir }}"
+      state: directory
+      mode: 0755
+      recurse: yes
+    
+  - name: Test if "{{ jboss_wildfly_compressed_dir }}/{{ jboss_wildfly_app_name }}" already exists.
+    stat:
+      path: "{{ jboss_wildfly_compressed_dir }}/{{ jboss_wildfly_app_name }}"
+    register: hd_file
+
+  - name: Download {{ jboss_wildfly_app_name }} into {{ jboss_wildfly_compressed_dir }}, when {{ jboss_wildfly_app_name }} does not exist.
+    get_url:
+      url:  "{{ jboss_wildfly_url }}"
+      dest: "{{ jboss_wildfly_compressed_dir }}/{{ jboss_wildfly_file_name }}"
+    when:  hd_file.stat.exists == False
+
+# delete temp files that tend to accumulate in the user ansible's home dir
+# place at the bottom of all playbooks
+  - include: ../../local_includes/delete-ansible-tmp-files.yml

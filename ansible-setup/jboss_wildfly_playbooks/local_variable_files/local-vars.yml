@@ -18,6 +18,9 @@ jboss_wildfly_base: /opt/jboss_wildfly
 jboss_wildfly_install: "{{ jboss_wildfly_base }}/{{ jboss_wildfly_version }}"
 jboss_wildfly_url: http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.tar.gz
 
+jboss_wildfly_app_name: app1-v01.war
+jboss_wildfly_app_url:  http://www.bks.name/downloads/{{ app_name }}
+
 # wildfly-8.1.0.Final.tar.gz
 jboss_wildfly_file_name: wildfly-{{ jboss_wildfly_version }}.tar.gz
 jboss_wildfly_compressed_dir: /opt/compressed

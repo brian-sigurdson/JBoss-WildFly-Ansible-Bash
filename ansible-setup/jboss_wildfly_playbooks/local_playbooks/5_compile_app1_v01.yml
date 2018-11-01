@@ -1,0 +1,39 @@
+---
+# Author:       Brian Sigurdson sigurdson.brian@gmail.com
+# Date:         2018-10-31
+# Description:  Prepare app1_v01 to be deployed.
+
+# Due to time constraints to complete this example Ansible program, and my own lack
+# of maven skills, I've used the code from 
+# WildFly: New Features Paperback – May 23, 2014
+# of which I have a legal copy through may Packt/Mapt membership.
+
+########################################################################################
+# start playbook
+########################################################################################
+
+- name: Package app1_v01.war
+  hosts: slaves
+  remote_user: ansible
+  become_user: root
+  become: true
+  become_method: sudo 
+  connection: ssh
+  gather_facts: false
+  vars:
+    app_name: app1-v01.war
+
+  vars_files:
+    - ../local_variable_files/local-vars.yml
+
+########################################################################################
+# start tasks
+########################################################################################
+
+  tasks:
+  # out of time for the moment
+  # finish this and an ant playbook later
+
+  # delete temp files that tend to accumulate in the user ansible's home dir
+  # place at the bottom of all playbooks
+  - include: ../../local_includes/delete-ansible-tmp-files.yml
