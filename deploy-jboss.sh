@@ -169,9 +169,12 @@ func_ansible_setup(){
 func_wildfly_setup(){
     echo "`date`" > /tmp/2-jboss-wildfly-setup-begin.txt
 
+    chmod 755 $PATH_TO_WILDFLY_SETUP_FILES_DIR/wildfly-setup.sh
+
     # wierd permission errors
-    # su - ansible -c "$PATH_TO_WILDFLY_SETUP_FILES_DIR/wildfly-setup.sh  $ANSIBLE_HOME" | tee -a /tmp/wildfly-setup.log
-    "$PATH_TO_WILDFLY_SETUP_FILES_DIR/wildfly-setup.sh  $ANSIBLE_HOME $ANSIBLE_UN"
+    su - ansible -c "$PATH_TO_WILDFLY_SETUP_FILES_DIR/wildfly-setup.sh  $ANSIBLE_HOME" | tee -a /tmp/wildfly-setup.log
+    
+    #$PATH_TO_WILDFLY_SETUP_FILES_DIR/wildfly-setup.sh  $ANSIBLE_HOME $ANSIBLE_UN
 
     echo "`date`" > /tmp/2-jboss-wildfly-setup-end.txt
 }
