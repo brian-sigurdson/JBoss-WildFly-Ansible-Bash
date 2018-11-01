@@ -169,7 +169,9 @@ func_ansible_setup(){
 func_wildfly_setup(){
     echo "`date`" > /tmp/2-jboss-wildfly-setup-begin.txt
 
-    su - ansible -c "$PATH_TO_WILDFLY_SETUP_FILES_DIR/wildfly-setup.sh  $ANSIBLE_HOME" | tee -a /tmp/wildfly-setup.log
+    # wierd permission errors
+    # su - ansible -c "$PATH_TO_WILDFLY_SETUP_FILES_DIR/wildfly-setup.sh  $ANSIBLE_HOME" | tee -a /tmp/wildfly-setup.log
+    "$PATH_TO_WILDFLY_SETUP_FILES_DIR/wildfly-setup.sh  $ANSIBLE_HOME $ANSIBLE_UN"
 
     echo "`date`" > /tmp/2-jboss-wildfly-setup-end.txt
 }
@@ -181,9 +183,9 @@ func_wildfly_setup(){
 echo "`date`" > /tmp/0-overall-setup-end.txt
 
 # func_firewall_setup
-func_test_slaves_ip_address
-func_test_password_file
-func_ansible_setup
+#func_test_slaves_ip_address
+#func_test_password_file
+#func_ansible_setup
 func_wildfly_setup
 
 echo "`date`" > /tmp/2-overall-setup-end.txt
