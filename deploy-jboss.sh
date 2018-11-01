@@ -181,8 +181,8 @@ func_wildfly_setup(){
 echo "`date`" > /tmp/0-overall-setup-end.txt
 
 # func_firewall_setup
-# func_test_slaves_ip_address
-# func_test_password_file
+func_test_slaves_ip_address
+func_test_password_file
 func_ansible_setup
 func_wildfly_setup
 
